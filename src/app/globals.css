@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+  AceVolumes brand tokens, sampled from the two logo files.
+  Plum #3B153A, gold #F0C987, ink #000000, paper #FFFFFF.
+  Dark theme = plum night with gold signal. Light theme = warm paper with plum ink.
+  One accent per theme, locked project-wide.
+*/
+@theme {
+  --color-plum: #3b153a;
+  --color-plum-2: #241023;
+  --color-plum-3: #170a16;
+  --color-gold: #f0c987;
+  --color-gold-deep: #a06a12;
+  --color-cream: #f6efe3;
+
+  --font-display: var(--font-archivo);
+  --font-body: var(--font-hanken);
+  --font-mono: var(--font-space);
+
+  --radius-card: 4px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+  --bg: #fbf7ee;
+  --bg-2: #f3ead9;
+  --fg: #2a1029;
+  --fg-muted: #71566c;
+  --hairline: #e2d0b4;
+  --accent: #3b153a;
+  --accent-fg: #fbf4e7;
+  --gold: #a06a12;
+  --glow: transparent;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #170a16;
+  --bg-2: #200d1e;
+  --fg: #f6efe3;
+  --fg-muted: #b39aad;
+  --hairline: #3c2239;
+  --accent: #f0c987;
+  --accent-fg: #2a1029;
+  --gold: #f0c987;
+  --glow: 0 0 24px rgba(240, 201, 135, 0.28);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+
+.muted {
+  color: var(--fg-muted);
+}
+
+.hairline {
+  border-color: var(--hairline);
+}
+
+/* Futuristic signal glow, brand-gold only, dark theme only. */
+.glow {
+  box-shadow: var(--glow);
+}
+
+.text-glow {
+  text-shadow: var(--glow);
+}
+
+/* Grain lives on one fixed, non-interactive layer only. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
