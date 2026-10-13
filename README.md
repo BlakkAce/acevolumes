@@ -68,6 +68,16 @@ hover and scroll behaviour.
   and can never trigger itself), no horizontal overflow, navigation is never
   delayed (page transitions are enter-only fades).
 
+## Studio dashboard (Phase 1 live)
+
+A private CRM gateway exists at a secret path (never linked from the site,
+hard-404 for every other unknown path via middleware, `noindex`, rate-limited
+passphrase login, 30-day signed session). Config lives in three env vars:
+`STUDIO_PATH`, `STUDIO_PASSPHRASE`, `SESSION_SECRET` — without them the
+studio fails closed (plain 404). Schema for clients / interactions /
+invoices / invoice-items is locked in `src/lib/db/schema.ts` (Drizzle).
+Plan: `docs/crm-plan.md` · Deploy steps: `docs/deploy-phase1.md`.
+
 ## Run
 
 ```bash

@@ -1,0 +1,58 @@
+import { NextResponse, type NextRequest } from "next/server";
+
+// Status-correct gate enforcement ahead of rendering: the [gate] catch-all
+// would otherwise match every unknown path and PPR streams a 200 shell
+// before notFound() can fire. Middleware runs first, so:
+//   - the exact secret slug (and its subpaths) -> studio, noindex headers
+//   - known public routes                    -> normal site
+//   - everything else (wrong slugs, probes)  -> hard, body-less 404
+// The dashboard still cryptographically verifies the session server-side —
+// this fence is for correct statuses and not leaking that the studio exists.
+
+const PUBLIC_ROUTES = ["/", "/about", "/contact", "/mortgage", "/services", "/work"];
+const PATH_RE = /^[a-z0-9]+(-[a-z0-9]+)+$/;
+
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const slug = (process.env.STUDIO_PATH ?? "").trim().replace(/^\/+|\/+$/g, "");
+  const configured =
+    slug.length >= 6 &&
+    PATH_RE.test(slug) &&
+    (process.env.STUDIO_PASSPHRASE ?? "").trim().length >= 12 &&
+    (process.env.SESSION_SECRET ?? "").trim().length >= 32;
+
+  const base = `/${slug}`;
+  if (configured && (pathname === base || pathname.startsWith(`${base}/`))) {
+    // Cookie-less dashboard visits bounce before any studio code streams.
+    if (pathname === `${base}/dashboard` && !req.cookies.get("av_studio")?.value) {
+      return NextResponse.redirect(new URL(base, req.url), 307);
+    }
+    const res = NextResponse.next();
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return res;
+  }
+
+  if (
+    PUBLIC_ROUTES.some(
+      (p) => pathname === p || (p !== "/" && pathname.startsWith(`${p}/`)),
+    ) ||
+    // public/ asset folders and files — anything else is a probe and 404s.
+    pathname.startsWith("/img/") ||
+    pathname.startsWith("/brand/") ||
+    /\.(svg|webmanifest|txt|xml)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  // Unknown path: hard 404, no body, nothing to fingerprint.
+  return new NextResponse(null, {
+    status: 404,
+    headers: { "X-Robots-Tag": "noindex, nofollow" },
+  });
+}
+
+export const config = {
+  // Site-wide matcher; the slug cannot be baked into a static matcher
+  // without leaking it, so gate membership is decided inside.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.png).*)"],
+};

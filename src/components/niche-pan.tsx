@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -156,13 +157,13 @@ export function NichePan() {
         ))}
 
         <div className={reduce ? "flex items-center" : "flex w-[70vw] shrink-0 items-center md:w-[30rem]"}>
-          <a
+          <Link
             href="/contact"
             className="group inline-flex items-center gap-4 font-display text-[clamp(1.4rem,2.6vw,2rem)] text-[var(--gold)]"
           >
             Start yours
             <ArrowRight size={26} className="transition-transform duration-300 group-hover:translate-x-2" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>
