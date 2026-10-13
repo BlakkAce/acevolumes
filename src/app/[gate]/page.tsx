@@ -31,13 +31,14 @@ function errorLabel(e?: string): string | null {
 }
 
 async function GateContent({
-  gate,
-  e,
+  params,
+  searchParams,
 }: {
-  gate: string;
-  e?: string;
+  params: Promise<{ gate: string }>;
+  searchParams: Promise<{ e?: string }>;
 }) {
   await connection(); // dynamic boundary: env + cookies are request-time only
+  const [{ gate }, { e }] = await Promise.all([params, searchParams]);
   // Fail closed: wrong slug or missing/malformed env config -> ordinary 404.
   if (!studioConfigured() || gate !== STUDIO_PATH) notFound();
   if (await hasSession()) redirect(`/${STUDIO_PATH}/dashboard`);
@@ -54,18 +55,7 @@ export default function GatePage({
 }) {
   return (
     <Suspense fallback={<LoginSkeleton />}>
-      <GateContentWithParams params={params} searchParams={searchParams} />
+      <GateContent params={params} searchParams={searchParams} />
     </Suspense>
   );
-}
-
-async function GateContentWithParams({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ gate: string }>;
-  searchParams: Promise<{ e?: string }>;
-}) {
-  const [{ gate }, { e }] = await Promise.all([params, searchParams]);
-  return <GateContent gate={gate} e={e} />;
 }

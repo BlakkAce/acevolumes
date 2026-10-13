@@ -70,6 +70,13 @@ hover and scroll behaviour.
 
 ## Studio dashboard (Phase 1 live)
 
+**Phase 2 CRM is live behind the gate:** dashboard (pipeline counts, open
+value, follow-ups due, latest activity), clients table with search/status
+filters, add/edit client, one-click stage moves, interaction timeline,
+CSV export. Screens render a "connect the database" panel until
+`DATABASE_URL` exists; schema ships in `src/lib/db/schema.ts` (Drizzle,
+`npx drizzle-kit push`).
+
 A private CRM gateway exists at a secret path (never linked from the site,
 hard-404 for every other unknown path via middleware, `noindex`, rate-limited
 passphrase login, 30-day signed session). Config lives in three env vars:

@@ -1,91 +1,54 @@
 import { Suspense } from "react";
+import { and, desc, eq, inArray, lte, sql } from "drizzle-orm";
 import { connection } from "next/server";
+import { getDb, dbConfigured } from "@/lib/db";
+import { clients, interactions } from "@/lib/db/schema";
+import {
+  OPEN_STATUSES,
+  STATUSES,
+  STATUS_LABEL,
+  statusTint,
+  usd,
+} from "@/lib/studio/crm";
+import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
+import { verifySessionToken } from "@/lib/studio/session";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { SESSION_COOKIE, STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
-import { verifySessionToken } from "@/lib/studio/session";
+import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
 
-function DashSkeleton() {
+function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 opacity-30">
-      <div className="h-3 w-24 rounded bg-current" />
-      <div className="mt-3 h-8 w-48 rounded bg-current" />
-      <div className="mt-8 h-40 w-full rounded-2xl bg-current" />
+    <div className="mx-auto w-full max-w-5xl px-4 py-10">
+      <p
+        className="font-mono text-[11px] uppercase tracking-[0.3em]"
+        style={{ color: "var(--accent)" }}
+      >
+        AceVolumes Studio
+      </p>
+      {children}
     </div>
   );
 }
 
-async function DashboardContent({ gate }: { gate: string }) {
-  await connection();
-  if (!studioConfigured() || gate !== STUDIO_PATH) notFound();
-
-  const store = await cookies();
-  const token = store.get(SESSION_COOKIE)?.value;
-
-  // Missing/expired session: render the login form right here — no redirect,
-  // so nothing depends on proxy-correct absolute URLs.
-  if (!verifySessionToken(token)) {
-    return (
-      <div className="flex min-h-[100dvh] items-center justify-center px-4">
-        <LoginView error="expired" />
-      </div>
-    );
-  }
-
-  const expiry = new Date(Number(token!.slice(0, token!.indexOf("."))));
-  const expires = expiry.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-
+function DbSetupPanel() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p
-            className="font-mono text-[11px] uppercase tracking-[0.3em]"
-            style={{ color: "var(--accent)" }}
-          >
-            AceVolumes Studio
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Dashboard
-          </h1>
-        </div>
-        <form action={`/${STUDIO_PATH}/logout`} method="post">
-          <button
-            type="submit"
-            className="h-9 rounded-lg border px-4 text-sm opacity-70 transition-opacity hover:opacity-100"
-            style={{ borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" }}
-          >
-            Log out
-          </button>
-        </form>
-      </div>
-
+    <Shell>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight">Dashboard</h1>
       <div
         className="mt-8 rounded-2xl border p-8"
-        style={{
-          borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)",
-          background: "color-mix(in oklab, var(--fg) 3%, transparent)",
-        }}
+        style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}
       >
-        <p className="text-lg font-medium">You are in.</p>
-        <p className="mt-2 text-sm opacity-60">
-          Session valid until {expires}. This gate, login and session guard are
-          live — the working CRM (clients, pipeline, follow-ups) lands here in
-          Phase 2, invoices in Phase 3, prospecting in Phase 4.
+        <p className="text-lg font-medium">One step left: connect the database</p>
+        <p className="mt-2 max-w-xl text-sm opacity-60">
+          The CRM needs its Postgres database. In Vercel: this project →
+          Storage → Create Database → Postgres, then add the offered
+          <code className="mx-1 rounded px-1 font-mono text-[12px]">DATABASE_URL</code>
+          as an environment variable and redeploy. The schema lands via
+          <code className="mx-1 rounded px-1 font-mono text-[12px]">drizzle-kit push</code>.
         </p>
-        <ul className="mt-6 grid gap-3 font-mono text-[12px] opacity-70 sm:grid-cols-2">
-          <li>→ Clients &amp; pipeline (Phase 2)</li>
-          <li>→ Follow-up timeline (Phase 2)</li>
-          <li>→ Invoices &amp; outstanding (Phase 3)</li>
-          <li>→ Prospecting / gap-scan (Phase 4)</li>
-        </ul>
       </div>
-    </div>
+    </Shell>
   );
 }
 
@@ -94,18 +57,210 @@ export default function DashboardPage({
 }: {
   params: Promise<{ gate: string }>;
 }) {
+  // No awaits in the shell — dynamic reads happen inside Suspense only.
   return (
-    <Suspense fallback={<DashSkeleton />}>
-      <DashboardContentGate params={params} />
+    <Suspense fallback={<OverviewSkeleton />}>
+      <Overview p={params} />
     </Suspense>
   );
 }
 
-async function DashboardContentGate({
-  params,
-}: {
-  params: Promise<{ gate: string }>;
-}) {
-  const { gate } = await params;
-  return <DashboardContent gate={gate} />;
+function OverviewSkeleton() {
+  return (
+    <Shell>
+      <div className="mt-6 h-8 w-48 rounded bg-current opacity-20" />
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-24 rounded-2xl bg-current opacity-10" />
+        ))}
+      </div>
+    </Shell>
+  );
+}
+
+async function Overview({ p }: { p: Promise<{ gate: string }> }) {
+  await connection(); // dynamic boundary — everything below is request-time
+  const { gate } = await p;
+  if (!studioConfigured() || gate !== STUDIO_PATH) notFound();
+  const store = await cookies();
+  if (!verifySessionToken(store.get(SESSION_COOKIE)?.value)) {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center px-4">
+        <LoginView error="expired" />
+      </div>
+    );
+  }
+  if (!dbConfigured()) return <DbSetupPanel />;
+  const db = getDb();
+
+  const counts = await db
+    .select({ status: clients.status, n: sql<number>`count(*)::int` })
+    .from(clients)
+    .groupBy(clients.status);
+  const countBy = new Map(counts.map((c) => [c.status, c.n]));
+
+  const [openValue] = await db
+    .select({
+      total: sql<string | null>`coalesce(sum(${clients.valueUsd}), 0)::text`,
+    })
+    .from(clients)
+    .where(inArray(clients.status, OPEN_STATUSES));
+
+  const soon = new Date();
+  soon.setDate(soon.getDate() + 7);
+  const followUps = await db
+    .select({
+      id: clients.id,
+      name: clients.name,
+      company: clients.company,
+      status: clients.status,
+      nextFollowUpAt: clients.nextFollowUpAt,
+    })
+    .from(clients)
+    .where(
+      and(
+        lte(clients.nextFollowUpAt, soon),
+        inArray(clients.status, ["lead", "proposal", "active", "delivered"]),
+      ),
+    )
+    .orderBy(clients.nextFollowUpAt)
+    .limit(8);
+
+  const recent = await db
+    .select({
+      id: interactions.id,
+      clientId: interactions.clientId,
+      type: interactions.type,
+      summary: interactions.summary,
+      happenedAt: interactions.happenedAt,
+      clientName: clients.name,
+    })
+    .from(interactions)
+    .innerJoin(clients, eq(clients.id, interactions.clientId))
+    .orderBy(desc(interactions.happenedAt))
+    .limit(6);
+
+  const base = `/${STUDIO_PATH}`;
+
+  return (
+    <Shell>
+      <div className="mt-2 flex items-center justify-between gap-4">
+        <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+        <div className="flex gap-2">
+          <a
+            href={`${base}/clients`}
+            className="rounded-lg border px-3 py-1.5 text-sm opacity-75 hover:opacity-100"
+            style={{ borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" }}
+          >
+            Clients
+          </a>
+          <a
+            href={`${base}/clients/new`}
+            className="rounded-lg px-3 py-1.5 text-sm font-semibold"
+            style={{ background: "var(--accent)", color: "var(--accent-fg)" }}
+          >
+            + Add client
+          </a>
+        </div>
+      </div>
+
+      {/* pipeline row */}
+      <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {STATUSES.map((s) => (
+          <a
+            key={s}
+            href={`${base}/clients?status=${s}`}
+            className="rounded-2xl border p-4 transition-transform hover:-translate-y-0.5"
+            style={{
+              borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)",
+            }}
+          >
+            <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider opacity-60">
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ background: statusTint(s) }}
+              />
+              {STATUS_LABEL[s]}
+            </p>
+            <p className="mt-2 text-2xl font-semibold tabular-nums">
+              {countBy.get(s) ?? 0}
+            </p>
+          </a>
+        ))}
+      </div>
+
+      <div
+        className="mt-4 rounded-2xl border p-5"
+        style={{
+          borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)",
+          background: "color-mix(in oklab, var(--accent) 7%, transparent)",
+        }}
+      >
+        <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">
+          Open pipeline value (lead + proposal + active)
+        </p>
+        <p className="mt-1 text-3xl font-semibold tabular-nums">
+          {usd(openValue?.total ?? "0")}
+        </p>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <section>
+          <h2 className="text-sm font-semibold uppercase tracking-wider opacity-60">
+            Follow-ups due / overdue
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {followUps.length === 0 ? (
+              <li className="text-sm opacity-50">Nothing due this week.</li>
+            ) : (
+              followUps.map((f) => (
+                <li key={f.id}>
+                  <a
+                    href={`${base}/clients/${f.id}`}
+                    className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm hover:opacity-90"
+                    style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}
+                  >
+                    <span>
+                      <span className="font-medium">{f.name}</span>
+                      <span className="opacity-50"> · {f.company ?? "—"}</span>
+                    </span>
+                    <span className="font-mono text-[12px] opacity-70">
+                      {f.nextFollowUpAt?.toISOString().slice(0, 10)}
+                    </span>
+                  </a>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-semibold uppercase tracking-wider opacity-60">
+            Latest activity
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {recent.length === 0 ? (
+              <li className="text-sm opacity-50">No interactions logged yet.</li>
+            ) : (
+              recent.map((r) => (
+                <li key={r.id}>
+                  <a
+                    href={`${base}/clients/${r.clientId}`}
+                    className="block rounded-xl border px-4 py-3 text-sm hover:opacity-90"
+                    style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}
+                  >
+                    <span className="font-mono text-[11px] uppercase tracking-wider opacity-60">
+                      {r.type} · {r.happenedAt.toISOString().slice(0, 10)}
+                    </span>
+                    <p className="mt-1 line-clamp-2 opacity-90">{r.summary}</p>
+                    <p className="mt-1 text-[12px] opacity-50">{r.clientName}</p>
+                  </a>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+      </div>
+    </Shell>
+  );
 }
