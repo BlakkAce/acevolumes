@@ -28,13 +28,26 @@ const PARAM_MAP: Record<string, string> = {
 
 type Status = "idle" | "error" | "sending" | "sent" | "fallback";
 
-const BUDGETS = [
-  "Under ₦250,000",
-  "₦250,000 to ₦500,000",
-  "₦500,000 to ₦1,000,000",
-  "Over ₦1,000,000",
-  "Not sure yet",
+// Canonical budget bands in NGN; labels convert to the visitor's chosen
+// currency via the shared static-rate table (approximate, marked with ≈).
+import { CURRENCY_CHOICES, fmtApprox } from "@/lib/currency";
+
+const BANDS: { value: string; ngn: [number, number | null] | null }[] = [
+  { value: "Under ₦250,000", ngn: [0, 250000] },
+  { value: "₦250,000 to ₦500,000", ngn: [250000, 500000] },
+  { value: "₦500,000 to ₦1,000,000", ngn: [500000, 1000000] },
+  { value: "Over ₦1,000,000", ngn: [1000000, null] },
+  { value: "Not sure yet", ngn: null },
 ];
+
+function bandLabel(band: (typeof BANDS)[number], currency: string): string {
+  if (!band.ngn) return band.value;
+  const [lo, hi] = band.ngn;
+  if (hi === null) {
+    return `Over ${fmtApprox(lo, currency)}`;
+  }
+  return `${fmtApprox(lo, currency)} to ${fmtApprox(hi, currency)}`;
+}
 
 const inputClass =
   "w-full rounded-[4px] border hairline bg-[var(--bg)] px-4 py-3.5 text-[15.5px] text-[var(--fg)] transition-colors duration-200 placeholder:text-[var(--fg-muted)]/70 focus:border-[var(--accent)] focus:outline-none";
@@ -57,6 +70,7 @@ function EnquiryFormInner() {
   const reduce = useReducedMotion();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<Status>("idle");
+  const [currency, setCurrency] = useState("USD");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const requested = searchParams.get("service") ?? "";
@@ -104,7 +118,7 @@ function EnquiryFormInner() {
       `Email: ${email}`,
       `Company: ${company || "-"}`,
       `Service: ${service || "-"}`,
-      `Budget: ${budget || "-"}`,
+      `Budget: ${budget ? `${budget}${currency !== "NGN" ? ` (${currency})` : ""}` : "-"}`,
       "",
       brief,
     ];
@@ -193,12 +207,33 @@ function EnquiryFormInner() {
             <option value="" disabled>
               Select a range
             </option>
-            {BUDGETS.map((b) => (
-              <option key={b} value={b}>
-                {b}
+            {BANDS.map((b) => (
+              <option key={b.value} value={b.value}>
+                {bandLabel(b, currency)}
               </option>
             ))}
           </select>
+          <div className="mt-2 flex items-center gap-2">
+            <label className="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--fg-muted)]" htmlFor="currency">
+              Currency
+            </label>
+            <select
+              id="currency"
+              name="currency"
+              className="rounded-[4px] border hairline bg-[var(--bg)] px-3 py-2 text-[13.5px] text-[var(--fg)] focus:border-[var(--accent)] focus:outline-none"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
+              {CURRENCY_CHOICES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <span className="text-[11.5px] text-[var(--fg-muted)]">
+              {currency === "NGN" ? "" : "approximate conversion"}
+            </span>
+          </div>
         </div>
       </div>
 

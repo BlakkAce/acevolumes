@@ -24,7 +24,7 @@ export default function AboutPage() {
       <PageHeader
         eyebrow="Studio"
         title="Small studio, working since 2016."
-        intro="AceVolumes is a Lagos digital studio with clients across the United States. We work with teams that have something worth selling and no patience for agencies that overpromise."
+        intro="AceVolumes is a Lagos digital studio with clients across the United States and a growing list of other countries. We work with teams that have something worth selling and no patience for agencies that overpromise."
       />
 
       <section className="mx-auto w-full max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
@@ -52,7 +52,7 @@ export default function AboutPage() {
             <div className="mt-6 space-y-4">
               {[
                 "We started in 2016 doing brand work for Lagos businesses that had one of two options back then: a cousin who knows Photoshop, or an agency charging corporate rates for a template.",
-                "Over time our clients moved overseas. Today most of them are based in the United States, and the work moved with them: mortgage and real estate teams first, then the e-commerce brands that sell to the same households.",
+                "Over time our clients moved overseas, and the work moved with them: mortgage and real estate teams first, then the e-commerce brands that sell to the same households. Today they are anchored in the United States and reach into other countries.",
                 "We are deliberately small. Every project gets the people you met in the first call, and we cap how many we run at once so nothing gets rushed.",
               ].map((para) => (
                 <Reveal key={para} delay={0.06}>

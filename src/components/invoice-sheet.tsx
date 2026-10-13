@@ -6,6 +6,7 @@
 
 export type SheetData = {
   number: string;
+  currency: string;
   status: string; // draft | sent | paid | overdue (display)
   issuedAt: Date | null;
   dueAt: Date | null;
@@ -26,8 +27,21 @@ function fmtDate(d: Date | null): string {
 }
 
 export function InvoiceSheet({ data, printButton }: { data: SheetData; printButton?: boolean }) {
-  const money = (v: string) =>
-    Number(v).toLocaleString("en-US", { style: "currency", currency: "USD" });
+  const money = (v: string) => {
+    const n = Number(v);
+    const cur = (data.currency || "USD").toUpperCase();
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: cur,
+        currencyDisplay: "narrowSymbol",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(n);
+    } catch {
+      return `${cur} ${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+  };
 
   return (
     <div className="invoice-sheet mx-auto w-full max-w-2xl bg-white p-10 text-[#241222]">

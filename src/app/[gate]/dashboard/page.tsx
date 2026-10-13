@@ -107,14 +107,21 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
     .from(clients)
     .where(inArray(clients.status, OPEN_STATUSES));
 
-  const [invAgg] = await db
+  const invAggs = await db
     .select({
-      outstanding: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'sent' then ${invoices.total} else 0 end), 0)::text`,
-      overdue: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'sent' and ${invoices.dueAt} < now() then ${invoices.total} else 0 end), 0)::text`,
+      currency: invoices.currency,
+      outstanding: sql<string>`coalesce(sum(case when ${invoices.status} = 'sent' then ${invoices.total} else 0 end), 0)::text`,
+      overdue: sql<string>`coalesce(sum(case when ${invoices.status} = 'sent' and ${invoices.dueAt} < now() then ${invoices.total} else 0 end), 0)::text`,
     })
-    .from(invoices);
-  const invOutstanding = invAgg?.outstanding ?? "0";
-  const invOverdue = invAgg?.overdue ?? "0";
+    .from(invoices)
+    .groupBy(invoices.currency);
+  const invActive = invAggs.filter(
+    (a) => Number(a.outstanding) > 0 || Number(a.overdue) > 0,
+  );
+  const invLines = (pick: (a: (typeof invAggs)[number]) => string) =>
+    invActive.length === 0
+      ? usdMoney(0, "USD")
+      : invActive.map((a) => usdMoney(pick(a), a.currency)).join("  ·  ");
 
   const soon = new Date();
   soon.setDate(soon.getDate() + 7);
@@ -231,8 +238,8 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
           <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">
             Outstanding invoices (sent)
           </p>
-          <p className="mt-1 text-3xl font-semibold tabular-nums">
-            {usdMoney(invOutstanding)}
+          <p className="mt-1 text-xl font-semibold tabular-nums leading-snug">
+            {invLines((a) => a.outstanding)}
           </p>
         </a>
         <a
@@ -243,8 +250,8 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
           <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">
             Overdue
           </p>
-          <p className="mt-1 text-3xl font-semibold tabular-nums">
-            {usdMoney(invOverdue)}
+          <p className="mt-1 text-xl font-semibold tabular-nums leading-snug">
+            {invLines((a) => a.overdue)}
           </p>
         </a>
       </div>

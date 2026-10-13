@@ -31,7 +31,7 @@ export function SiteFooter() {
           />
           <p className="max-w-[36ch] text-[15px] leading-relaxed muted">
             We pride ourselves on delivering the very best. From Lagos, for clients
-            across the United States and the wider world.
+            across the United States and the wider world — same promise, any timezone.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export function SiteFooter() {
             </h2>
             <address className="mt-5 space-y-1 text-[15px] not-italic leading-relaxed muted">
               <p>Lagos, Nigeria</p>
-              <p>Clients across the US</p>
+              <p>Clients across borders</p>
               <p>Mon to Fri, 9am to 6pm WAT</p>
             </address>
           </div>

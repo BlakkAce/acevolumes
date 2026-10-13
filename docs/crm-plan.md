@@ -1,6 +1,6 @@
 # AceVolumes Studio Dashboard — CRM Plan
 
-Status: Phases 1-3 BUILT (2026-10-13); production DB connected (Neon). Invoicing live: records, AV-numbering, line items, print/PDF view, public share links, mailto send handoff, outstanding/overdue on dashboard. Remaining optional: real SMTP sending (needs Gmail app-password from owner), Stripe pay-now (owner decision). Next: Phase 4 prospecting.
+Status: Phases 1-3 BUILT (2026-10-13); production DB connected (Neon). Invoicing live: records, AV-numbering, line items, print/PDF view, public share links, mailto send handoff, outstanding/overdue on dashboard. Multi-currency shipped (2026-10-13): invoices bill in ANY ISO-4217 currency (native formatting, per-currency aggregates, no auto-conversion); contact-page budget bands convert to a visitor-picked currency (static ≈ rates in src/lib/currency.ts); site copy now claims worldwide clientele. Remaining optional: real SMTP sending, Stripe pay-now, live FX rates. Next: Phase 4 prospecting.
 Owner-facing summary of what we'll build, what it costs, and what is needed.
 
 ---

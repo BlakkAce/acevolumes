@@ -80,7 +80,7 @@ export function Hero() {
             viewport={{ once: true }}
             className="font-mono text-[12px] uppercase tracking-[0.12em] muted"
           >
-            Lagos studio. Clients across the United States.
+            Lagos studio. Clients worldwide — US, Europe, Africa and beyond.
           </motion.p>
 
           <KineticHeading

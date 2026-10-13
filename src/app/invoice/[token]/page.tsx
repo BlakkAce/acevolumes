@@ -51,6 +51,7 @@ async function View({ p }: { p: Promise<{ token: string }> }) {
       <InvoiceSheet
         data={{
           number: inv.number,
+          currency: inv.currency,
           status: displayStatus(inv),
           issuedAt: inv.issuedAt,
           dueAt: inv.dueAt,

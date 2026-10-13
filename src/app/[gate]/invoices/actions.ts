@@ -45,12 +45,14 @@ function parseItems(fd: FormData) {
 
 function commonFields(fd: FormData) {
   const taxRate = Number(str(fd, "tax_rate").replace("%", "")) || 0;
+  const cur = str(fd, "currency").toUpperCase();
   return {
     clientId: Number(str(fd, "client_id")),
     issuedAt: dateOrNull(fd, "issued_at"),
     dueAt: dateOrNull(fd, "due_at"),
     paymentInstructions: str(fd, "payment_instructions") || null,
     taxRatePct: Math.min(Math.max(taxRate, 0), 90),
+    currency: /^[A-Z]{3}$/.test(cur) ? cur : "USD",
   };
 }
 
@@ -68,6 +70,7 @@ export async function createInvoice(fd: FormData) {
     .values({
       clientId: f.clientId,
       number: await nextInvoiceNumber(),
+      currency: f.currency,
       status: "draft",
       subtotal: totals.subtotal,
       tax: totals.tax,
@@ -104,6 +107,7 @@ export async function updateInvoice(fd: FormData) {
     .update(invoices)
     .set({
       clientId: f.clientId,
+      currency: f.currency,
       issuedAt: f.issuedAt,
       dueAt: f.dueAt,
       paymentInstructions: f.paymentInstructions,

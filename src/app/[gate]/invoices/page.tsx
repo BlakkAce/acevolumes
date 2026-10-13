@@ -66,6 +66,7 @@ async function InvoicesContent({
       number: invoices.number,
       status: invoices.status,
       total: invoices.total,
+      currency: invoices.currency,
       dueAt: invoices.dueAt,
       clientName: clients.name,
       clientCompany: clients.company,
@@ -75,13 +76,23 @@ async function InvoicesContent({
     .orderBy(desc(invoices.id))
     .limit(200);
 
-  const [agg] = await db
+  // Money is grouped per currency — sums across currencies would be fiction.
+  const aggs = await db
     .select({
-      outstanding: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'sent' then ${invoices.total} else 0 end), 0)::text`,
-      overdue: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'sent' and ${invoices.dueAt} < now() then ${invoices.total} else 0 end), 0)::text`,
-      paid: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'paid' then ${invoices.total} else 0 end), 0)::text`,
+      currency: invoices.currency,
+      outstanding: sql<string>`coalesce(sum(case when ${invoices.status} = 'sent' then ${invoices.total} else 0 end), 0)::text`,
+      overdue: sql<string>`coalesce(sum(case when ${invoices.status} = 'sent' and ${invoices.dueAt} < now() then ${invoices.total} else 0 end), 0)::text`,
+      paid: sql<string>`coalesce(sum(case when ${invoices.status} = 'paid' then ${invoices.total} else 0 end), 0)::text`,
     })
-    .from(invoices);
+    .from(invoices)
+    .groupBy(invoices.currency);
+  const active = aggs.filter(
+    (a) => Number(a.outstanding) > 0 || Number(a.overdue) > 0 || Number(a.paid) > 0,
+  );
+  const moneyLines = (pick: (a: (typeof aggs)[number]) => string) =>
+    active.length === 0
+      ? usd(0, "USD")
+      : active.map((a) => usd(pick(a), a.currency)).join("  ·  ");
 
   const base = `/${STUDIO_PATH}`;
 
@@ -100,9 +111,9 @@ async function InvoicesContent({
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         {[
-          { label: "Outstanding (sent)", value: agg?.outstanding, tint: "#8e8eff" },
-          { label: "Overdue", value: agg?.overdue, tint: "#e5484d" },
-          { label: "Paid to date", value: agg?.paid, tint: "#4cc38a" },
+          { label: "Outstanding (sent)", lines: moneyLines((a) => a.outstanding), tint: "#8e8eff" },
+          { label: "Overdue", lines: moneyLines((a) => a.overdue), tint: "#e5484d" },
+          { label: "Paid to date", lines: moneyLines((a) => a.paid), tint: "#4cc38a" },
         ].map((c) => (
           <div
             key={c.label}
@@ -112,8 +123,8 @@ async function InvoicesContent({
             <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">
               {c.label}
             </p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums">
-              {usd(c.value)}
+            <p className="mt-1 text-xl font-semibold tabular-nums leading-snug">
+              {c.lines}
             </p>
           </div>
         ))}
@@ -164,7 +175,7 @@ async function InvoicesContent({
                     <td className="hidden px-4 py-3 font-mono text-[12px] opacity-70 sm:table-cell">
                       {r.dueAt ? r.dueAt.toISOString().slice(0, 10) : "—"}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums">{usd(r.total)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{usd(r.total, r.currency)}</td>
                     <td className="px-4 py-3 text-right">
                       <span
                         className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px]"

@@ -13,6 +13,7 @@ import {
 import { verifySessionToken } from "@/lib/studio/session";
 import { LoginView } from "../../login-view";
 import { ItemsEditor } from "../items-editor";
+import { CURRENCY_CHOICES } from "@/lib/currency";
 import { createInvoice } from "../actions";
 
 export default function NewInvoicePage({
@@ -108,6 +109,29 @@ async function NewInvoice({ p }: { p: Promise<{ gate: string }> }) {
             </div>
           </div>
           <ItemsEditor />
+          <div>
+            <label htmlFor="currency" className="mb-1 block font-mono text-[11px] uppercase tracking-wider opacity-60">
+              Currency (any ISO code)
+            </label>
+            <input
+              id="currency"
+              name="currency"
+              list="currency-list"
+              defaultValue="USD"
+              maxLength={3}
+              className={input}
+              style={border}
+              placeholder="USD"
+            />
+            <datalist id="currency-list">
+              {CURRENCY_CHOICES.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+            <p className="mt-1 text-[11.5px] opacity-50">
+              Amounts are billed in this currency — nothing is auto-converted.
+            </p>
+          </div>
           <div>
             <label htmlFor="payment_instructions" className="mb-1 block font-mono text-[11px] uppercase tracking-wider opacity-60">
               Payment instructions (shown on the invoice)

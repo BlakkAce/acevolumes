@@ -52,6 +52,7 @@ async function Print({ p }: { p: Promise<{ gate: string; id: string }> }) {
         printButton
         data={{
           number: inv.number,
+          currency: inv.currency,
           status: displayStatus(inv),
           issuedAt: inv.issuedAt,
           dueAt: inv.dueAt,

@@ -5,7 +5,7 @@ import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getDb, dbConfigured } from "@/lib/db";
 import { clients, invoiceItems, invoices } from "@/lib/db/schema";
-import { STATUS_STYLE, displayStatus } from "@/lib/studio/invoices";
+import { STATUS_STYLE, displayStatus, usd as money } from "@/lib/studio/invoices";
 import {
   SESSION_COOKIE,
   STUDIO_PATH,
@@ -16,6 +16,7 @@ import { LoginView } from "../../login-view";
 import { ItemsEditor } from "../items-editor";
 import { ShareBar } from "../share-bar";
 import { deleteInvoice, setInvoiceStatus, updateInvoice } from "../actions";
+import { CURRENCY_CHOICES } from "@/lib/currency";
 
 const input =
   "h-10 w-full rounded-lg border bg-transparent px-3 text-sm outline-none";
@@ -111,21 +112,15 @@ async function Detail({ p }: { p: Promise<{ gate: string; id: string }> }) {
       >
         <div>
           <p className="font-mono text-[10px] uppercase tracking-wider opacity-50">Total</p>
-          <p className="text-2xl font-semibold tabular-nums">
-            ${Number(inv.total).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
+          <p className="text-2xl font-semibold tabular-nums">{money(inv.total, inv.currency)}</p>
         </div>
         <div>
           <p className="font-mono text-[10px] uppercase tracking-wider opacity-50">Subtotal</p>
-          <p className="text-sm tabular-nums opacity-70">
-            ${Number(inv.subtotal).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
+          <p className="text-sm tabular-nums opacity-70">{money(inv.subtotal, inv.currency)}</p>
         </div>
         <div>
           <p className="font-mono text-[10px] uppercase tracking-wider opacity-50">Tax</p>
-          <p className="text-sm tabular-nums opacity-70">
-            ${Number(inv.tax).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
+          <p className="text-sm tabular-nums opacity-70">{money(inv.tax, inv.currency)}</p>
         </div>
         <div>
           <p className="font-mono text-[10px] uppercase tracking-wider opacity-50">Due</p>
@@ -171,7 +166,7 @@ async function Detail({ p }: { p: Promise<{ gate: string; id: string }> }) {
         <form action={updateInvoice} className="mt-3 space-y-5">
           <input type="hidden" name="id" value={inv.id} />
           <input type="hidden" name="status" value={inv.status} />
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="sm:col-span-1">
               <label htmlFor="client_id" className={label}>Client</label>
               <select id="client_id" name="client_id" defaultValue={String(inv.clientId)} className={input} style={border}>
@@ -189,6 +184,15 @@ async function Detail({ p }: { p: Promise<{ gate: string; id: string }> }) {
             <div>
               <label htmlFor="due_at" className={label}>Due date</label>
               <input id="due_at" name="due_at" type="date" defaultValue={dv(inv.dueAt)} className={input} style={border} />
+            </div>
+            <div>
+              <label htmlFor="currency" className={label}>Currency</label>
+              <input id="currency" name="currency" list="currency-list" defaultValue={inv.currency} maxLength={3} className={input} style={border} />
+              <datalist id="currency-list">
+                {CURRENCY_CHOICES.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </div>
           </div>
           <ItemsEditor

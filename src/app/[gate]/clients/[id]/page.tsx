@@ -78,6 +78,7 @@ async function Detail({
       status: invoices.status,
       dueAt: invoices.dueAt,
       total: invoices.total,
+      currency: invoices.currency,
     })
     .from(invoices)
     .where(eq(invoices.clientId, id))
@@ -225,7 +226,7 @@ async function Detail({
                     <span className="font-mono text-[12px] opacity-60">
                       {iv.dueAt ? iv.dueAt.toISOString().slice(0, 10) : "—"}
                     </span>
-                    <span className="tabular-nums">{money(iv.total)}</span>
+                    <span className="tabular-nums">{money(iv.total, iv.currency)}</span>
                     <span
                       className="rounded-full px-2.5 py-0.5 text-[12px]"
                       style={{ background: `color-mix(in oklab, ${st.tint} 16%, transparent)`, color: st.tint }}

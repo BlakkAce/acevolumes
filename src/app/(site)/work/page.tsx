@@ -26,7 +26,7 @@ export default function WorkPage() {
       <PageHeader
         eyebrow="Work"
         title="Selected projects."
-        intro="A short list rather than a gallery of everything we have ever touched. Most of these clients are based in the United States, and several engagements are still under confidentiality."
+        intro="A short list rather than a gallery of everything we have ever touched. Most of these clients are based in the United States, others sit in other countries, and several engagements are still under confidentiality."
       />
 
       <div className="mx-auto w-full max-w-[1400px] px-5 py-20 md:px-8 md:py-28">

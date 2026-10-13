@@ -17,7 +17,7 @@ const FAQS = [
   },
   {
     q: "Do you work with US clients?",
-    a: "Most of our clients are based in the United States. We keep daily call slots that line up with US mornings, and reports land in your timezone, not ours.",
+    a: "We work across borders and timezones — the United States remains our deepest market, with clients in other countries too. We keep daily call slots that line up with US mornings and European afternoons, and reports land in your timezone, not ours.",
   },
   {
     q: "Can you take over a website someone else built?",

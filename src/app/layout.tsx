@@ -28,11 +28,11 @@ export const metadata: Metadata = {
     template: "%s - AceVolumes",
   },
   description:
-    "Lagos digital studio working since 2016 with clients across the United States. Brand identity, websites and social media for mortgage, real estate and e-commerce teams.",
+    "Lagos digital studio working since 2016 with clients worldwide — from the United States to Europe, Africa and beyond. Brand identity, websites and social media for mortgage, real estate and e-commerce teams.",
   openGraph: {
     title: "AceVolumes",
     description:
-      "Brand identity, website design and social media for mortgage, real estate and e-commerce brands. Lagos studio, US clients, working since 2016.",
+      "Brand identity, website design and social media for mortgage, real estate and e-commerce brands. Lagos studio, clients worldwide, working since 2016.",
     type: "website",
     locale: "en_NG",
   },

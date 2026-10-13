@@ -64,8 +64,22 @@ export const STATUS_STYLE: Record<string, { tint: string; label: string }> = {
   paid: { tint: "#4cc38a", label: "Paid" },
 };
 
-export function usd(v: string | number | null | undefined): string {
+
+/** Format an amount in the invoice's own currency (any ISO-4217 code).
+ * Invoices always show two decimals — money convention. */
+export function usd(v: string | number | null | undefined, code = "USD"): string {
   const n = typeof v === "string" ? Number(v) : (v ?? 0);
-  if (!Number.isFinite(n)) return "$0";
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  const cur = code.toUpperCase();
+  if (!Number.isFinite(n)) return `${cur} 0.00`;
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: cur,
+      currencyDisplay: "narrowSymbol",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n);
+  } catch {
+    return `${cur} ${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
 }
