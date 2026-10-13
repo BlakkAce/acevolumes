@@ -54,7 +54,8 @@ Public pages: static, unchanged, zero links to the studio.
 | Postgres database (Vercel Postgres / Neon) | Where client data lives | $0 free tier to start |
 | Auth.js | Login + session handling (audited, standard library) | $0 |
 | Drizzle ORM | Type-safe database access in code | $0 |
-| Resend (Phase 3 only) | Emailing follow-up reminders | $0 up to 3k emails/mo |
+| Resend (Phase 3 only) | Emailing invoices + follow-up reminders | $0 up to 3k emails/mo |
+| Stripe (optional, Phase 3) | "Pay now" card payments on invoices | free + ~2.9% + 30c/US transaction |
 
 **Total to run v1: $0/month.** Realistic worst case once the business
 depends on it: ~$20/mo (Vercel Pro). You bring: a Vercel account, a GitHub
@@ -74,9 +75,19 @@ clients
 interactions (timeline per client)
   id, client_id, type  call | email | meeting | note
   summary, happened_at
+
+invoices (Phase 3 — schema locked now so it slots in cleanly)
+  id, client_id, number (AV-2026-001…)
+  status      draft | sent | paid | overdue (auto-flagged from due_at)
+  issued_at, due_at, currency USD
+  subtotal, tax, total, payment_instructions
+invoice_items
+  id, invoice_id, description, qty, unit_price
 ```
 
 - CSV export button from day one — your data is never hostage to the tool.
+- Invoices pull client + deal data automatically; dashboard later gains
+  "outstanding" and "overdue" money figures alongside pipeline value.
 - Client data is real PII: strong passphrase (4–5 random words minimum),
   never share the studio URL, occasional CSV backups.
 
@@ -89,6 +100,9 @@ interactions (timeline per client)
 | `/{secret}/clients` | Table, filter by status/service, search |
 | `/{secret}/clients/new` | Add client |
 | `/{secret}/clients/[id]` | Full record, edit, interaction timeline |
+| `/{secret}/invoices` (P3) | List w/ status filters, outstanding + overdue totals |
+| `/{secret}/invoices/[id]` (P3) | Editor, mark sent/paid, brand-styled printable PDF, send action |
+| `/invoice/[token]` (P3) | Unguessable read-only invoice page the client can open |
 
 Style: same brand system as the site (plum/gold, Archivo/Hanken), no fluff —
 a working tool, not a showpiece.
@@ -101,7 +115,15 @@ a working tool, not a showpiece.
 - **Phase 2 — the CRM (one–two sessions):** clients CRUD, pipeline list,
   dashboard overview, interactions timeline, CSV export. Exit test: your
   real clients entered and it replaces whatever spreadsheet/notes you keep now.
-- **Phase 3 — backlog (later, pick as needed):** follow-up email reminders
+- **Phase 3 — invoicing (one–two sessions):** invoices tied to clients with
+  line items + numbering, brand-styled invoice (print-to-PDF from a
+  print-optimised page), send via Gmail SMTP app-password (from
+  bestacesales@gmail.com, best deliverability, no domain DNS needed) or
+  Resend; unguessable client view link; outstanding/overdue figures on the
+  dashboard. Optional same phase: Stripe "Pay now" if the owner wants card
+  payments (~2.9% + 30c per US transaction) — otherwise payment
+  instructions text on the invoice, $0.
+- **Phase 4 — backlog (later, pick as needed):** follow-up email reminders
   (Resend), file attachments, TOTP two-factor, stealth-404, audit log,
   invoice/deal fields.
 
@@ -116,6 +138,11 @@ a working tool, not a showpiece.
   Viable; recommended only if you outgrow single-admin auth.
 - **Building custom (recommended):** data stays in your own database under
   your own domain, matches the brand, $0 tools, and the code is ours.
+
+- **Free dedicated invoicing tools (Zoho Invoice, Wave):** genuinely good
+  for invoicing alone. Build-it-in wins when invoices should pull client and
+  deal data automatically and the dashboard shows outstanding money; if we
+  ever only need invoicing, these are the honest Plan B.
 
 ## 9. Decisions needed from the owner
 
