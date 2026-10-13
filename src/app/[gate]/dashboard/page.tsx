@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { and, desc, eq, inArray, lte, sql } from "drizzle-orm";
 import { connection } from "next/server";
 import { getDb, dbConfigured } from "@/lib/db";
-import { clients, interactions } from "@/lib/db/schema";
+import { clients, interactions, invoices } from "@/lib/db/schema";
 import {
   OPEN_STATUSES,
   STATUSES,
@@ -10,6 +10,7 @@ import {
   statusTint,
   usd,
 } from "@/lib/studio/crm";
+import { usd as usdMoney } from "@/lib/studio/invoices";
 import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { verifySessionToken } from "@/lib/studio/session";
 import { cookies } from "next/headers";
@@ -106,6 +107,15 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
     .from(clients)
     .where(inArray(clients.status, OPEN_STATUSES));
 
+  const [invAgg] = await db
+    .select({
+      outstanding: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'sent' then ${invoices.total} else 0 end), 0)::text`,
+      overdue: sql<string | null>`coalesce(sum(case when ${invoices.status} = 'sent' and ${invoices.dueAt} < now() then ${invoices.total} else 0 end), 0)::text`,
+    })
+    .from(invoices);
+  const invOutstanding = invAgg?.outstanding ?? "0";
+  const invOverdue = invAgg?.overdue ?? "0";
+
   const soon = new Date();
   soon.setDate(soon.getDate() + 7);
   const followUps = await db
@@ -147,6 +157,13 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
       <div className="mt-2 flex items-center justify-between gap-4">
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <div className="flex gap-2">
+          <a
+            href={`${base}/invoices`}
+            className="rounded-lg border px-3 py-1.5 text-sm opacity-75 hover:opacity-100"
+            style={{ borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" }}
+          >
+            Invoices
+          </a>
           <a
             href={`${base}/clients`}
             className="rounded-lg border px-3 py-1.5 text-sm opacity-75 hover:opacity-100"
@@ -202,6 +219,34 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
         <p className="mt-1 text-3xl font-semibold tabular-nums">
           {usd(openValue?.total ?? "0")}
         </p>
+      </div>
+
+      {/* money row */}
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <a
+          href={`${base}/invoices`}
+          className="rounded-2xl border p-5 transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: "color-mix(in oklab, #8e8eff 30%, transparent)" }}
+        >
+          <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">
+            Outstanding invoices (sent)
+          </p>
+          <p className="mt-1 text-3xl font-semibold tabular-nums">
+            {usdMoney(invOutstanding)}
+          </p>
+        </a>
+        <a
+          href={`${base}/invoices`}
+          className="rounded-2xl border p-5 transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: "color-mix(in oklab, #e5484d 30%, transparent)" }}
+        >
+          <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">
+            Overdue
+          </p>
+          <p className="mt-1 text-3xl font-semibold tabular-nums">
+            {usdMoney(invOverdue)}
+          </p>
+        </a>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

@@ -35,12 +35,18 @@ export function middleware(req: NextRequest) {
     PUBLIC_ROUTES.some(
       (p) => pathname === p || (p !== "/" && pathname.startsWith(`${p}/`)),
     ) ||
+    // Public read-only client invoice links (unguessable tokens).
+    pathname.startsWith("/invoice/") ||
     // public/ asset folders and files — anything else is a probe and 404s.
     pathname.startsWith("/img/") ||
     pathname.startsWith("/brand/") ||
     /\.(svg|webmanifest|txt|xml)$/i.test(pathname)
   ) {
-    return NextResponse.next();
+    const res = NextResponse.next();
+    if (pathname.startsWith("/invoice/")) {
+      res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    }
+    return res;
   }
 
   // Unknown path: hard 404, no body, nothing to fingerprint.

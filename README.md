@@ -77,6 +77,13 @@ CSV export. Screens render a "connect the database" panel until
 `DATABASE_URL` exists; schema ships in `src/lib/db/schema.ts` (Drizzle,
 `npx drizzle-kit push`).
 
+**Phase 3 invoicing is live behind the gate:** invoices with AV-numbering,
+line-item editor (live totals preview + tax), draft/sent/paid with automatic
+overdue display, brand-styled printable view (print to PDF), unguessable
+public client view links at `/invoice/<token>` (noindex, read-only), a
+mailto "prepare email" handoff (no server sending, nothing to leak), and
+outstanding/overdue money on the dashboard.
+
 A private CRM gateway exists at a secret path (never linked from the site,
 hard-404 for every other unknown path via middleware, `noindex`, rate-limited
 passphrase login, 30-day signed session). Config lives in three env vars:

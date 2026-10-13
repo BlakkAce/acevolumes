@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 import { desc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getDb, dbConfigured } from "@/lib/db";
-import { clients, interactions } from "@/lib/db/schema";
+import { clients, interactions, invoices } from "@/lib/db/schema";
+import { STATUS_STYLE, displayStatus, usd as money } from "@/lib/studio/invoices";
 import { STATUSES, STATUS_LABEL, isStatus, statusTint, usd } from "@/lib/studio/crm";
 import {
   SESSION_COOKIE,
@@ -69,6 +70,18 @@ async function Detail({
     .from(interactions)
     .where(eq(interactions.clientId, id))
     .orderBy(desc(interactions.happenedAt));
+
+  const clientInvoices = await db
+    .select({
+      id: invoices.id,
+      number: invoices.number,
+      status: invoices.status,
+      dueAt: invoices.dueAt,
+      total: invoices.total,
+    })
+    .from(invoices)
+    .where(eq(invoices.clientId, id))
+    .orderBy(desc(invoices.id));
 
   const base = `/${STUDIO_PATH}`;
   const status = isStatus(c.status) ? c.status : "lead";
@@ -183,6 +196,48 @@ async function Detail({
             ))
           )}
         </ol>
+      </section>
+
+      {/* invoices */}
+      <section className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-wider opacity-60">
+          Invoices
+        </h2>
+        <ul className="mt-3 space-y-2">
+          {clientInvoices.length === 0 ? (
+            <li className="text-sm opacity-50">
+              No invoices yet.{" "}
+              <a href={`${base}/invoices/new`} className="underline">
+                Create one →
+              </a>
+            </li>
+          ) : (
+            clientInvoices.map((iv) => {
+              const st = STATUS_STYLE[displayStatus(iv)];
+              return (
+                <li key={iv.id}>
+                  <a
+                    href={`${base}/invoices/${iv.id}`}
+                    className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm hover:opacity-90"
+                    style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}
+                  >
+                    <span className="font-mono text-[13px] font-medium">{iv.number}</span>
+                    <span className="font-mono text-[12px] opacity-60">
+                      {iv.dueAt ? iv.dueAt.toISOString().slice(0, 10) : "—"}
+                    </span>
+                    <span className="tabular-nums">{money(iv.total)}</span>
+                    <span
+                      className="rounded-full px-2.5 py-0.5 text-[12px]"
+                      style={{ background: `color-mix(in oklab, ${st.tint} 16%, transparent)`, color: st.tint }}
+                    >
+                      {st.label}
+                    </span>
+                  </a>
+                </li>
+              );
+            })
+          )}
+        </ul>
       </section>
 
       {/* edit */}
