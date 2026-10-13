@@ -43,6 +43,7 @@ const BANDS: { value: string; ngn: [number, number | null] | null }[] = [
 function bandLabel(band: (typeof BANDS)[number], currency: string): string {
   if (!band.ngn) return band.value;
   const [lo, hi] = band.ngn;
+  if (lo === 0) return `Under ${fmtApprox(hi ?? 0, currency)}`;
   if (hi === null) {
     return `Over ${fmtApprox(lo, currency)}`;
   }
