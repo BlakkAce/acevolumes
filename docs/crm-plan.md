@@ -123,7 +123,11 @@ a working tool, not a showpiece.
   dashboard. Optional same phase: Stripe "Pay now" if the owner wants card
   payments (~2.9% + 30c per US transaction) — otherwise payment
   instructions text on the invoice, $0.
-- **Phase 4 — backlog (later, pick as needed):** follow-up email reminders
+- **Phase 4 — prospecting, "ClientScout for ourselves" (one–two sessions):**
+  see §10. Search niche/city → Places data → gap-scan each site (own
+  engine, deeper than ClientScout's) → score → save as lead straight into
+  the CRM pipeline with `source: scout`.
+- **Phase 5 — backlog (later, pick as needed):** follow-up email reminders
   (Resend), file attachments, TOTP two-factor, stealth-404, audit log,
   invoice/deal fields.
 
@@ -153,3 +157,44 @@ a working tool, not a showpiece.
    or your own words?
 5. Secret path: pick an unguessable slug (not `/admin`, not `/crm`) — e.g.
    two random words + two digits. You choose; it can be changed later.
+
+---
+
+## 10. Prospecting module — "ClientScout for ourselves" (added 2026-10-13)
+
+Single-user, so everything that makes ClientScout a SaaS (billing, accounts,
+lead allowances) is dropped. What remains is the working core, wired into
+our dashboard and closed all the way to paid invoices.
+
+**Loop:** search (service, niche, country, city, count, website-status and
+rating filters) → Google Places data (names, phones, websites, ratings) →
+**own gap-scan engine** probes each website → opportunity score + reasons →
+one click saves a prospect as a CRM lead (`source: scout`) → contact,
+follow-ups, win → Phase 3 invoice. ClientScout stops at "contact them";
+ours continues to the money.
+
+**Gap-scan engine (proof of concept already working):**
+`scripts/gap-scan-demo.mjs` scans real sites in ~2s with no API keys and
+reports builder fingerprint (WordPress/Shopify/Wix/Next.js…), TLS, mobile
+viewport, meta description, title strength, response time — scored 0–100
+with human-readable reasons. Ran 2026-10-13 on all 7 AceVolumes client
+sites: correctly flagged True Terra (missing meta description, weak title,
+35/100) and InstaFi (2.0s response, 25/100), cleared HCMG (Next.js,
+healthy). The production version adds crawl depth we control: robots/sitemap
+presence, favicon/social-tag hygiene, mobile-render check, optional PSI.
+
+**Data source (pricing verified 2026-10-13, post-March-2025 per-SKU model):**
+
+| Route | Cost for own use | Notes |
+| --- | --- | --- |
+| **Google Places API direct (recommended)** | Effectively $0/mo for our volume | Free tiers: Text Search Enterprise (returns phone, website, rating) 1,000 free requests/mo ≈ up to ~20k businesses at 20/request; beyond that $35/1k requests. Official, ToS-clean. Needs Google Cloud project w/ billing card on file even for free tier. Caching rule: persist place_id + our scan results freely; refresh Places fields rather than storing stale copies long-term. |
+| Outscraper / reseller scrape | $3/1k records (500 free/mo); full profiles ~$12–14/1k with add-ons | No Google account; but scraping-side ToS murkiness, and Google direct is cheaper at our volume. Fallback only. |
+| OpenStreetMap/Overpass | $0 | No ratings/reviews/phones reliability. Not viable for scored leads. |
+
+**Owner must provide (when built):** a Google Cloud project with Places API
+(New) enabled + an API key restricted to that API, stored as an env var on
+the host. That is the only external dependency in the whole module.
+
+**UI (same hidden route group, same auth):** a Prospecting tab alongside
+Clients/Invoices — the search form (like ClientScout's), results table with
+score + gap reasons + click-to-call/WhatsApp, and "Save as lead".
