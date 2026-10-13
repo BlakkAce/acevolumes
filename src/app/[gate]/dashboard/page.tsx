@@ -165,6 +165,13 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <div className="flex gap-2">
           <a
+            href={`${base}/scout`}
+            className="rounded-lg border px-3 py-1.5 text-sm opacity-75 hover:opacity-100"
+            style={{ borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" }}
+          >
+            Scout
+          </a>
+          <a
             href={`${base}/invoices`}
             className="rounded-lg border px-3 py-1.5 text-sm opacity-75 hover:opacity-100"
             style={{ borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" }}

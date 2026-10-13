@@ -84,6 +84,13 @@ public client view links at `/invoice/<token>` (noindex, read-only), a
 mailto "prepare email" handoff (no server sending, nothing to leak), and
 outstanding/overdue money on the dashboard.
 
+**Phase 4 prospecting ("Scout") is live behind the gate:** paste-a-list mode
+scores up to 50 real websites per run (mobile support, TLS, meta basics,
+speed, builder fingerprint -> 0-100 opportunity score, best first) and saves
+businesses as CRM leads with duplicate protection. Google Places search
+(niche + country + city, rating/website-status filters) is fully coded and
+activates when `PLACES_API_KEY` is added to the environment.
+
 A private CRM gateway exists at a secret path (never linked from the site,
 hard-404 for every other unknown path via middleware, `noindex`, rate-limited
 passphrase login, 30-day signed session). Config lives in three env vars:
