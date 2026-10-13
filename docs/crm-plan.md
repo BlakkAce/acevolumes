@@ -1,6 +1,6 @@
 # AceVolumes Studio Dashboard — CRM Plan
 
-Status: Phase 1 + 2 BUILT (2026-10-13). Phase 3 next: invoicing.
+Status: Phase 1 + 2 BUILT (2026-10-13); production database connected (Neon, schema pushed). Phase 3 next: invoicing.
 Owner-facing summary of what we'll build, what it costs, and what is needed.
 
 ---
