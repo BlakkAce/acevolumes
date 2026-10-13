@@ -11,13 +11,20 @@ const WINDOW_MS = 10 * 60 * 1000;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// Relative Location: browsers resolve it against the current origin, so the
+// redirect works behind any proxy/host (bind-address URLs like 0.0.0.0:3000
+// break previews and proxied deploys).
+function seeOther(location: string): NextResponse {
+  return new NextResponse(null, { status: 303, headers: { Location: location } });
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ gate: string }> },
 ) {
   const { gate } = await params;
   if (!studioConfigured() || gate !== STUDIO_PATH) {
-    return NextResponse.redirect(new URL("/404", req.url), 303);
+    return seeOther("/404");
   }
 
   const ip =
@@ -25,10 +32,7 @@ export async function POST(
   const now = Date.now();
   const rec = attempts.get(ip);
   if (rec && rec.until > now && rec.n >= MAX_ATTEMPTS) {
-    return NextResponse.redirect(
-      new URL(`/${STUDIO_PATH}?e=rate`, req.url),
-      303,
-    );
+    return seeOther(`/${STUDIO_PATH}?e=rate`);
   }
 
   // Level the wall: every attempt costs ~0.4-0.8s, online or offline.
@@ -41,15 +45,12 @@ export async function POST(
     const next = rec && rec.until > now ? rec : { n: 0, until: now + WINDOW_MS };
     next.n += 1;
     attempts.set(ip, next);
-    return NextResponse.redirect(new URL(`/${STUDIO_PATH}?e=1`, req.url), 303);
+    return seeOther(`/${STUDIO_PATH}?e=1`);
   }
 
   attempts.delete(ip);
   const expires = sessionExpiresAt();
-  const res = NextResponse.redirect(
-    new URL(`/${STUDIO_PATH}/dashboard`, req.url),
-    303,
-  );
+  const res = seeOther(`/${STUDIO_PATH}/dashboard`);
   res.cookies.set({
     name: "av_studio",
     value: signSession(expires),

@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { notFound, redirect } from "next/navigation";
 import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { hasSession } from "@/lib/studio/session";
+import { LoginView } from "./login-view";
 
 // cacheComponents/PPR: neutral static shell, everything below streams at
 // request time (env vars, cookies, params never touch the prerender).
@@ -23,6 +24,12 @@ function LoginSkeleton() {
   );
 }
 
+function errorLabel(e?: string): string | null {
+  if (e === "rate") return "rate";
+  if (e === "1") return "1";
+  return null;
+}
+
 async function GateContent({
   gate,
   e,
@@ -35,74 +42,7 @@ async function GateContent({
   if (!studioConfigured() || gate !== STUDIO_PATH) notFound();
   if (await hasSession()) redirect(`/${STUDIO_PATH}/dashboard`);
 
-  const error =
-    e === "rate"
-      ? "Too many attempts. Wait ten minutes and try again."
-      : e === "1"
-        ? "Incorrect passphrase."
-        : null;
-
-  return (
-    <div className="flex min-h-[100dvh] items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div
-          className="rounded-2xl border p-8"
-          style={{
-            background: "var(--card, transparent)",
-            borderColor: "color-mix(in oklab, var(--fg) 14%, transparent)",
-          }}
-        >
-          <p
-            className="font-mono text-[11px] uppercase tracking-[0.3em]"
-            style={{ color: "var(--accent)" }}
-          >
-            Studio
-          </p>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight">
-            Private access
-          </h1>
-          <p className="mt-2 text-sm opacity-60">
-            Enter your passphrase to open the studio dashboard.
-          </p>
-          {error ? (
-            <p
-              className="mt-4 rounded-lg px-3 py-2 text-[13px]"
-              style={{ background: "rgba(220,60,60,0.12)", color: "#e5484d" }}
-              role="alert"
-            >
-              {error}
-            </p>
-          ) : null}
-          <form
-            action={`/${STUDIO_PATH}/login`}
-            method="post"
-            className="mt-6 space-y-3"
-          >
-            <input
-              type="password"
-              name="passphrase"
-              id="passphrase"
-              required
-              autoComplete="current-password"
-              placeholder="Passphrase"
-              className="h-11 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus:ring-1"
-              style={{ borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" }}
-            />
-            <button
-              type="submit"
-              className="h-11 w-full rounded-lg text-sm font-semibold"
-              style={{ background: "var(--accent)", color: "var(--accent-fg)" }}
-            >
-              Unlock
-            </button>
-          </form>
-        </div>
-        <p className="mt-4 text-center font-mono text-[11px] opacity-40">
-          30-day session · rate-limited · noindex
-        </p>
-      </div>
-    </div>
-  );
+  return <LoginView error={errorLabel(e)} />;
 }
 
 export default function GatePage({

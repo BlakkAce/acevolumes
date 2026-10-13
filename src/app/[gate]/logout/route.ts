@@ -9,7 +9,10 @@ export async function POST(
   if (!studioConfigured() || gate !== STUDIO_PATH) {
     return NextResponse.redirect(new URL("/404", req.url), 303);
   }
-  const res = NextResponse.redirect(new URL(`/${STUDIO_PATH}`, req.url), 303);
+  const res = new NextResponse(null, {
+    status: 303,
+    headers: { Location: `/${STUDIO_PATH}` },
+  });
   res.cookies.set({
     name: "av_studio",
     value: "",

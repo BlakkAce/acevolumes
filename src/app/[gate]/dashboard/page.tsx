@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { SESSION_COOKIE, STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { verifySessionToken } from "@/lib/studio/session";
+import { LoginView } from "../login-view";
 
 function DashSkeleton() {
   return (
@@ -20,12 +21,19 @@ async function DashboardContent({ gate }: { gate: string }) {
   if (!studioConfigured() || gate !== STUDIO_PATH) notFound();
 
   const store = await cookies();
-  if (!verifySessionToken(store.get(SESSION_COOKIE)?.value)) {
-    redirect(`/${STUDIO_PATH}`);
+  const token = store.get(SESSION_COOKIE)?.value;
+
+  // Missing/expired session: render the login form right here — no redirect,
+  // so nothing depends on proxy-correct absolute URLs.
+  if (!verifySessionToken(token)) {
+    return (
+      <div className="flex min-h-[100dvh] items-center justify-center px-4">
+        <LoginView error="expired" />
+      </div>
+    );
   }
 
-  const token = store.get(SESSION_COOKIE)!.value;
-  const expiry = new Date(Number(token.slice(0, token.indexOf("."))));
+  const expiry = new Date(Number(token!.slice(0, token!.indexOf("."))));
   const expires = expiry.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",

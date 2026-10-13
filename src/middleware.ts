@@ -23,10 +23,9 @@ export function middleware(req: NextRequest) {
 
   const base = `/${slug}`;
   if (configured && (pathname === base || pathname.startsWith(`${base}/`))) {
-    // Cookie-less dashboard visits bounce before any studio code streams.
-    if (pathname === `${base}/dashboard` && !req.cookies.get("av_studio")?.value) {
-      return NextResponse.redirect(new URL(base, req.url), 307);
-    }
+    // NOTE: no redirects here — edge middleware validates Location as an
+    // absolute URL, which leaks bind-address hosts behind proxies. The
+    // dashboard page itself renders the login form when unauthenticated.
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
     return res;
