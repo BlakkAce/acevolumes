@@ -47,6 +47,11 @@ export function organizationLd() {
       jobTitle: FOUNDER.role,
       url: `${SITE}/founder`,
     },
+    sameAs: [
+      "https://www.linkedin.com/company/acevolumes",
+      "https://www.instagram.com/acevolumes/",
+      "https://web.facebook.com/acevolumes",
+    ],
   };
 }
 

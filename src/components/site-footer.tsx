@@ -98,6 +98,11 @@ export function SiteFooter() {
               <p>Clients across borders</p>
               <p>Mon to Fri, 9am to 6pm WAT</p>
             </address>
+            <div className="mt-4 flex flex-wrap gap-4 font-mono text-[12px] uppercase tracking-[0.08em]">
+              <a href="https://www.linkedin.com/company/acevolumes" target="_blank" rel="noreferrer noopener" className="transition-colors hover:text-[var(--gold)]">LinkedIn</a>
+              <a href="https://www.instagram.com/acevolumes/" target="_blank" rel="noreferrer noopener" className="transition-colors hover:text-[var(--gold)]">Instagram</a>
+              <a href="https://web.facebook.com/acevolumes" target="_blank" rel="noreferrer noopener" className="transition-colors hover:text-[var(--gold)]">Facebook</a>
+            </div>
           </div>
         </div>
 
