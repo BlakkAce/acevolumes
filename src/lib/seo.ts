@@ -4,7 +4,10 @@
 import { CATALOG, PROJECTS } from "@/lib/content";
 import { FOUNDER } from "@/lib/founder";
 
-export const SITE = "https://acevolumes.com.ng";
+// Canonical site origin for all SEO output. Currently the Vercel URL;
+// flip this ONE line to https://acevolumes.com.ng when the custom domain
+// is connected — sitemap, robots, canonicals, OG and schema all follow.
+export const SITE = "https://acevolumes.vercel.app";
 
 export function organizationLd() {
   return {

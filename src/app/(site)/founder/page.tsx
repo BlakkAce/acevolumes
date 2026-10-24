@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Reveal } from "@/components/reveal";
 import { Amplitude, MARK as MARK_VALUES } from "@/components/amplitude";
 import { JsonLd } from "@/components/json-ld";
-import { breadcrumbLd } from "@/lib/seo";
+import { breadcrumbLd, SITE } from "@/lib/seo";
 import { FOUNDER } from "@/lib/founder";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: `${FOUNDER.name} — ${FOUNDER.role}`,
   description: `Meet the founder of AceVolumes: a Lagos-based digital studio founder working with clients worldwide since 2016 — mortgage, real estate and e-commerce brands.`,
-  alternates: { canonical: "./founder" },
+  alternates: { canonical: `${SITE}/founder` },
 };
 
 export default function FounderPage() {
@@ -25,7 +25,7 @@ export default function FounderPage() {
             "@type": "Person",
             name: FOUNDER.name,
             jobTitle: FOUNDER.role,
-            image: `${"https://acevolumes.com.ng"}${FOUNDER.photo}`,
+            image: `${SITE}${FOUNDER.photo}`,
             worksFor: { "@type": "Organization", name: "AceVolumes" },
             address: { "@type": "PostalAddress", addressLocality: "Lagos", addressCountry: "NG" },
             ...(FOUNDER.links.length

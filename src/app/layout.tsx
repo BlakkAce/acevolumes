@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Hanken_Grotesk, Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SITE } from "@/lib/seo";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -22,7 +23,7 @@ const space = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://acevolumes.com.ng"),
+  metadataBase: new URL(SITE),
   title: {
     default: "AceVolumes - Volume that moves markets",
     template: "%s - AceVolumes",

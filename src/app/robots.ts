@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const BASE = "https://acevolumes.com.ng";
+import { SITE as BASE } from "@/lib/seo";
 
 // Deliberately does NOT mention the studio path: robots.txt is public and
 // listing a secret there would leak it. The gate sends noindex headers

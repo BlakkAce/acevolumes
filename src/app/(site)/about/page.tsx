@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE } from "@/lib/seo";
 import Image from "next/image";
 import { PageHeader } from "@/components/page-header";
 import { ImageReveal } from "@/components/image-reveal";
@@ -6,7 +7,7 @@ import { Reveal } from "@/components/reveal";
 import { STEPS, VALUES } from "@/lib/content";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "./about" },
+  alternates: { canonical: `${SITE}/about` },
   title: "Studio",
   description:
     "AceVolumes is a Lagos digital studio working since 2016 on brand identity, websites and social media for Nigerian businesses.",

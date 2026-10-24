@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SITE } from "@/lib/seo";
 
 // Site-wide social card (1200x630): plum night, gold wordmark, tagline.
 // Next attaches it automatically to every page's opengraph/twitter metadata.
@@ -54,7 +55,7 @@ export default function OgImage() {
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 26, opacity: 0.6 }}>
-          acevolumes.com.ng · Lagos · clients worldwide since 2016
+          {SITE.replace("https://", "")} · Lagos · clients worldwide since 2016
         </div>
       </div>
     ),

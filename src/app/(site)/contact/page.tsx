@@ -4,10 +4,10 @@ import { PageHeader } from "@/components/page-header";
 import { Reveal } from "@/components/reveal";
 import { Amplitude, MARK } from "@/components/amplitude";
 import { JsonLd } from "@/components/json-ld";
-import { faqLd, organizationLd, breadcrumbLd } from "@/lib/seo";
+import { faqLd, organizationLd, breadcrumbLd, SITE } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "./contact" },
+  alternates: { canonical: `${SITE}/contact` },
   title: "Contact",
   description:
     "Start a project with AceVolumes. Tell us what you sell and who you are trying to reach, and we will reply with a plan, a price and a timeline.",

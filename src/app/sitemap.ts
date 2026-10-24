@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { PROJECTS } from "@/lib/content";
-
-const BASE = "https://acevolumes.com.ng";
+import { SITE as BASE } from "@/lib/seo";
 
 // The public sitemap. The studio gate is deliberately absent (it 404s for
 // strangers and sends noindex headers); public invoice links are excluded.

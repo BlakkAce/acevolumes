@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
@@ -8,7 +9,7 @@ import { Reveal } from "@/components/reveal";
 import { PROJECTS } from "@/lib/content";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "./work" },
+  alternates: { canonical: `${SITE}/work` },
   title: "Work",
   description:
     "Selected brand identity, website and social media projects from the AceVolumes studio in Lagos.",
