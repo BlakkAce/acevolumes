@@ -24,6 +24,9 @@ const space = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
+  verification: {
+    google: "5PsjQYlCMILsjXZ3uw9Q3k9WQ1E8tKNRUGrJk7n5aow",
+  },
   title: {
     default: "AceVolumes - Volume that moves markets",
     template: "%s - AceVolumes",
