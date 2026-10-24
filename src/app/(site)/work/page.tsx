@@ -8,6 +8,7 @@ import { Reveal } from "@/components/reveal";
 import { PROJECTS } from "@/lib/content";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "./work" },
   title: "Work",
   description:
     "Selected brand identity, website and social media projects from the AceVolumes studio in Lagos.",

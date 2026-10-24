@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/json-ld";
+import { caseStudyLd, breadcrumbLd } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
@@ -33,6 +35,12 @@ export default async function CaseStudyPage({
 
   return (
     <>
+      <JsonLd data={caseStudyLd(project)} />
+      <JsonLd data={breadcrumbLd([
+        { name: "Home", path: "/" },
+        { name: "Work", path: "/work" },
+        { name: project.client, path: `/work/${project.slug}` },
+      ])} />
       <header className="border-b hairline bg-[var(--bg-2)]">
         <div className="mx-auto w-full max-w-[1400px] px-5 pb-16 pt-14 md:px-8 md:pb-20 md:pt-20">
           <Reveal>

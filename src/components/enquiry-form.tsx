@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { submitEnquiry } from "@/app/(site)/contact/actions";
 import { useSearchParams } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import { CheckCircle, PaperPlaneTilt, WarningCircle } from "@phosphor-icons/react/dist/ssr";
@@ -125,8 +126,19 @@ function EnquiryFormInner() {
     ];
 
     setStatus("sending");
+
+    // 1) Authoritative store: straight into the studio CRM as a Lead.
+    let stored = false;
     try {
-      // Direct delivery to the studio inbox; no third-party account needed.
+      const result = await submitEnquiry(data);
+      stored = result.ok && result.stored;
+    } catch {
+      stored = false;
+    }
+
+    // 2) Email notification to acevolumesofficial@gmail.com (best-effort).
+    let emailed = false;
+    try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 12000);
       const res = await fetch("https://formsubmit.co/ajax/acevolumesofficial@gmail.com", {
@@ -147,18 +159,30 @@ function EnquiryFormInner() {
       });
       clearTimeout(timer);
       const json = (await res.json().catch(() => null)) as { success?: string | boolean } | null;
-      const ok = res.ok && (json?.success === "true" || json?.success === true);
-      if (!ok) throw new Error(`delivery ${res.status}`);
+      emailed = res.ok && (json?.success === "true" || json?.success === true);
+    } catch {
+      emailed = false;
+    }
+
+    if (stored) {
+      // In the pipeline even if the email notification failed.
       setStatus("sent");
       form.reset();
-    } catch {
-      // Delivery service unreachable: open the visitor's mail app instead.
-      window.location.href = `mailto:acevolumesofficial@gmail.com?subject=${subject}&body=${encodeURIComponent(
-        bodyLines.join("\n"),
-      )}`;
-      setStatus("fallback");
-      form.reset();
+      return;
     }
+
+    if (emailed) {
+      setStatus("sent");
+      form.reset();
+      return;
+    }
+
+    // 3) Nothing worked: hand off to the visitor's mail app so it still lands.
+    window.location.href = `mailto:acevolumesofficial@gmail.com?subject=${subject}&body=${encodeURIComponent(
+      bodyLines.join("\n"),
+    )}`;
+    setStatus("fallback");
+    form.reset();
   }
 
   return (

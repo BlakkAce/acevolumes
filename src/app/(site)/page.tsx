@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import { organizationLd, websiteLd } from "@/lib/seo";
 import { CapabilityMarquee } from "@/components/capability-marquee";
 import { CountUp } from "@/components/count-up";
 import { Hero } from "@/components/hero";
@@ -11,6 +13,8 @@ import { CATALOG, MARQUEE_ITEMS, PROOF, STEPS, TESTIMONIALS, VALUES } from "@/li
 export default function Home() {
   return (
     <>
+      <JsonLd data={organizationLd()} />
+      <JsonLd data={websiteLd()} />
       <Hero />
 
       {/* Credentials band. Real numbers only, counted up on arrival. */}

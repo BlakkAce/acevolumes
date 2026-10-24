@@ -35,6 +35,13 @@ export const metadata: Metadata = {
       "Brand identity, website design and social media for mortgage, real estate and e-commerce brands. Lagos studio, clients worldwide, working since 2016.",
     type: "website",
     locale: "en_NG",
+    siteName: "AceVolumes",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AceVolumes — Volume that moves markets",
+    description:
+      "Brand identity, website design and social media for mortgage, real estate and e-commerce brands. Lagos studio, clients worldwide, working since 2016.",
   },
 };
 

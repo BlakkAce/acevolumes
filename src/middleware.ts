@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // The dashboard still cryptographically verifies the session server-side —
 // this fence is for correct statuses and not leaking that the studio exists.
 
-const PUBLIC_ROUTES = ["/", "/about", "/contact", "/mortgage", "/services", "/work"];
+const PUBLIC_ROUTES = ["/", "/about", "/contact", "/founder", "/mortgage", "/services", "/work"];
 const PATH_RE = /^[a-z0-9]+(-[a-z0-9]+)+$/;
 
 export function middleware(req: NextRequest) {
@@ -37,6 +37,11 @@ export function middleware(req: NextRequest) {
     ) ||
     // Public read-only client invoice links (unguessable tokens).
     pathname.startsWith("/invoice/") ||
+    // Generated metadata routes (opengraph-image, icons): extensionless.
+    pathname.startsWith("/opengraph-image") ||
+    pathname.startsWith("/twitter-image") ||
+    pathname.startsWith("/apple-icon") ||
+    pathname.startsWith("/icon") ||
     // public/ asset folders and files — anything else is a probe and 404s.
     pathname.startsWith("/img/") ||
     pathname.startsWith("/brand/") ||

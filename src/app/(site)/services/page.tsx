@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/json-ld";
+import { organizationLd, breadcrumbLd } from "@/lib/seo";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Reveal } from "@/components/reveal";
@@ -6,6 +8,7 @@ import { ServicesExplorer } from "@/components/services-explorer";
 import { Amplitude, GROWTH_CURVE } from "@/components/amplitude";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "./services" },
   title: "Services",
   description:
     "Nine service categories from AceVolumes: AI video, websites, branding, digital and email marketing, custom development, AI automation, business systems, content and technical consulting, plus a dedicated mortgage technology vertical.",
@@ -14,6 +17,8 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
+      <JsonLd data={organizationLd()} />
+      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Services", path: "/services" }])} />
       <PageHeader
         eyebrow="Services"
         title="Nine disciplines, one studio."

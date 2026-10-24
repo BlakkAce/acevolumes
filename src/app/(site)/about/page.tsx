@@ -6,6 +6,7 @@ import { Reveal } from "@/components/reveal";
 import { STEPS, VALUES } from "@/lib/content";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "./about" },
   title: "Studio",
   description:
     "AceVolumes is a Lagos digital studio working since 2016 on brand identity, websites and social media for Nigerian businesses.",

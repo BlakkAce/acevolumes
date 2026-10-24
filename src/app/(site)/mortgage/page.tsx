@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/json-ld";
+import { organizationLd, breadcrumbLd } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
@@ -7,6 +9,7 @@ import { Reveal } from "@/components/reveal";
 import { ARIVE_CLUSTERS, MORTGAGE_AREAS, MORTGAGE_RECORD } from "@/lib/content";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "./mortgage" },
   title: "Mortgage Technology",
   description:
     "Custom mortgage software, loan pipeline management, borrower application systems, mortgage CRM workflows, ARIVE integration pathways, MISMO export tooling and system audits from AceVolumes.",
@@ -15,6 +18,8 @@ export const metadata: Metadata = {
 export default function MortgagePage() {
   return (
     <>
+      <JsonLd data={organizationLd()} />
+      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Mortgage technology", path: "/mortgage" }])} />
       <PageHeader
         eyebrow="Mortgage Technology"
         title="Software for the business of lending."

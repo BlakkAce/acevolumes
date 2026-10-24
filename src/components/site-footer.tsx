@@ -14,6 +14,7 @@ const STUDIO = [
   { href: "/work", label: "Work" },
   { href: "/about", label: "About the studio" },
   { href: "/about#process", label: "How we work" },
+  { href: "/founder", label: "Meet the founder" },
   { href: "/contact", label: "Contact" },
 ];
 
