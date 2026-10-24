@@ -111,7 +111,7 @@ npm run build && npm run start
 
 - Testimonials use realistic placeholder names and US roles; replace with real
   client quotes and permission.
-- Enquiry form and all contact points use `bestacesales@gmail.com`. The form
+- Enquiry form and all contact points use `acevolumesofficial@gmail.com`. The form
   posts to FormSubmit (no account needed) and falls back to the visitor's mail
   client if the service is unreachable. FormSubmit sends a one-time activation
   email to the inbox on first use - click it once and deliveries go live.

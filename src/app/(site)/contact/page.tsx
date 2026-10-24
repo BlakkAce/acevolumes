@@ -58,10 +58,10 @@ export default function ContactPage() {
               Direct
             </h2>
             <a
-              href="mailto:bestacesales@gmail.com"
+              href="mailto:acevolumesofficial@gmail.com"
               className="mt-3 block font-display text-[clamp(1.1rem,2vw,1.4rem)] text-[var(--accent)] underline decoration-[var(--accent)]/40 underline-offset-[6px] transition-colors hover:decoration-[var(--accent)]"
             >
-              bestacesales@gmail.com
+              acevolumesofficial@gmail.com
             </a>
           </Reveal>
 

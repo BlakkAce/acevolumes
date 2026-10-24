@@ -129,7 +129,7 @@ function EnquiryFormInner() {
       // Direct delivery to the studio inbox; no third-party account needed.
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 12000);
-      const res = await fetch("https://formsubmit.co/ajax/bestacesales@gmail.com", {
+      const res = await fetch("https://formsubmit.co/ajax/acevolumesofficial@gmail.com", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         signal: controller.signal,
@@ -153,7 +153,7 @@ function EnquiryFormInner() {
       form.reset();
     } catch {
       // Delivery service unreachable: open the visitor's mail app instead.
-      window.location.href = `mailto:bestacesales@gmail.com?subject=${subject}&body=${encodeURIComponent(
+      window.location.href = `mailto:acevolumesofficial@gmail.com?subject=${subject}&body=${encodeURIComponent(
         bodyLines.join("\n"),
       )}`;
       setStatus("fallback");
@@ -283,7 +283,7 @@ function EnquiryFormInner() {
       {status === "sent" && (
         <p className="flex items-center gap-2.5 text-[14px] text-[var(--accent)]">
           <CheckCircle size={18} weight="fill" />
-          Sent. It is on its way to bestacesales@gmail.com - we reply as fast as we can.
+          Sent. It is on its way to acevolumesofficial@gmail.com - we reply as fast as we can.
         </p>
       )}
 
@@ -291,7 +291,7 @@ function EnquiryFormInner() {
         <p className="flex items-start gap-2.5 text-[14px] text-[#d4553f]">
           <WarningCircle size={18} weight="fill" className="mt-[2px] shrink-0" />
           The delivery service could not be reached, so we opened your email app
-          instead. Or write to us directly at bestacesales@gmail.com.
+          instead. Or write to us directly at acevolumesofficial@gmail.com.
         </p>
       )}
 
@@ -308,7 +308,7 @@ function EnquiryFormInner() {
         </button>
         <p className="mt-4 flex max-w-[52ch] items-start gap-2.5 text-[14px] leading-relaxed muted">
           <CheckCircle size={18} weight="fill" className="mt-[2px] shrink-0 text-[var(--accent)]" />
-          Enquiries are delivered straight to bestacesales@gmail.com. We reply as
+          Enquiries are delivered straight to acevolumesofficial@gmail.com. We reply as
           fast as we can - usually within a day.
         </p>
       </div>

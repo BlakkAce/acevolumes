@@ -41,10 +41,10 @@ export function SiteFooter() {
               Let us make some noise.
             </p>
             <a
-              href="mailto:bestacesales@gmail.com"
+              href="mailto:acevolumesofficial@gmail.com"
               className="mt-6 inline-block font-mono text-[13px] uppercase tracking-[0.09em] text-[var(--gold)] underline decoration-[var(--gold)]/40 underline-offset-[6px] transition-colors hover:decoration-[var(--gold)]"
             >
-              bestacesales@gmail.com
+              acevolumesofficial@gmail.com
             </a>
             <p className="mt-3 max-w-[42ch] text-[15px] leading-relaxed muted">
               Tell us what you sell and who you are trying to reach. We will reply

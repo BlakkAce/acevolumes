@@ -44,7 +44,7 @@ export function ShareBar({
     "",
     "Thank you —",
     "AceVolumes",
-    "bestacesales@gmail.com",
+    "acevolumesofficial@gmail.com",
   ]
     .filter(Boolean)
     .join("\n");

@@ -118,7 +118,7 @@ a working tool, not a showpiece.
 - **Phase 3 — invoicing (one–two sessions):** invoices tied to clients with
   line items + numbering, brand-styled invoice (print-to-PDF from a
   print-optimised page), send via Gmail SMTP app-password (from
-  bestacesales@gmail.com, best deliverability, no domain DNS needed) or
+  acevolumesofficial@gmail.com, best deliverability, no domain DNS needed) or
   Resend; unguessable client view link; outstanding/overdue figures on the
   dashboard. Optional same phase: Stripe "Pay now" if the owner wants card
   payments (~2.9% + 30c per US transaction) — otherwise payment
