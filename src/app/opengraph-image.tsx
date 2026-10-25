@@ -3,7 +3,7 @@ import { SITE } from "@/lib/seo";
 
 // Site-wide social card (1200x630): plum night, gold wordmark, tagline.
 // Next attaches it automatically to every page's opengraph/twitter metadata.
-export const alt = "AceVolumes — digital systems that make results easier";
+export const alt = "AceVolumes: digital systems that make results easier";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

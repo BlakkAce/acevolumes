@@ -20,7 +20,7 @@ const FAQS = [
   },
   {
     q: "Do you work with US clients?",
-    a: "We work across borders and timezones — the United States remains our deepest market, with clients in other countries too. We keep daily call slots that line up with US mornings and European afternoons, and reports land in your timezone, not ours.",
+    a: "We work across borders and timezones. The United States remains our deepest market, with clients in other countries too. We keep daily call slots that line up with US mornings and European afternoons, and reports land in your timezone, not ours.",
   },
   {
     q: "Can you take over a website someone else built?",
@@ -43,6 +43,29 @@ export default function ContactPage() {
         title="Tell us what you need."
         intro="A paragraph is enough to start. We will reply with a plan, a fixed price and a timeline, not a sales call invitation."
       />
+
+      <section aria-label="What happens next" className="border-b hairline bg-[var(--bg-2)]">
+        <div className="mx-auto grid w-full max-w-[1400px] gap-8 px-5 py-12 md:grid-cols-3 md:px-8">
+          {[
+            ["1", "We reply within one working day",
+              "Usually with a few sharp questions first. We cannot price what we do not understand yet."],
+            ["2", "You get one number and one date",
+              "A plan with a fixed price and a delivery date. No hourly billing, no scope that grows on its own."],
+            ["3", "Work starts, and you watch",
+              "Progress every Friday until launch, then training for your team and ninety days of reporting."],
+          ].map(([n, t, d]) => (
+            <Reveal key={n} className="flex gap-5">
+              <span aria-hidden className="font-display text-[2.4rem] leading-none text-[var(--gold)]">
+                {n}
+              </span>
+              <div>
+                <h2 className="font-display text-[1.1rem]">{t}</h2>
+                <p className="mt-1.5 max-w-[36ch] text-[14.5px] leading-relaxed muted">{d}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
       <div className="mx-auto grid w-full max-w-[1400px] gap-14 px-5 py-20 md:grid-cols-12 md:gap-16 md:px-8 md:py-28">
         <div className="md:col-span-7">

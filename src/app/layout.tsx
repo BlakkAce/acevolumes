@@ -29,10 +29,10 @@ export const metadata: Metadata = {
   },
   title: {
     default: "AceVolumes | Digital Systems That Make Results Easier",
-    template: "%s - AceVolumes",
+    template: "%s | AceVolumes",
   },
   description:
-    "AceVolumes builds digital systems that make results easier — websites, e-commerce stores, branding, marketing, AI content and custom software. Lagos studio, clients worldwide since 2016.",
+    "AceVolumes builds digital systems that make results easier: websites, e-commerce stores, branding, marketing, AI content and custom software. Lagos studio, clients worldwide since 2016.",
   openGraph: {
     title: "AceVolumes",
     description:
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AceVolumes — Digital Systems That Make Results Easier",
+    title: "AceVolumes: Digital Systems That Make Results Easier",
     description:
       "Websites, e-commerce stores, branding, marketing, AI content and custom software. Lagos studio, clients in the US and worldwide since 2016.",
   },

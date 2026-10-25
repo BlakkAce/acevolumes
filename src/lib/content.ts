@@ -24,10 +24,10 @@ export const PROJECTS: Project[] = [
     summary:
       "A California mortgage banker-and-broker site built around one promise: we shop till we drop your rate. Purchase, refinance and cash-out paths one tap away, with calculators and instant pre-qualification.",
     challenge:
-      "InstaFi operates as both a mortgage banker and a mortgage broker with 70+ lending relationships - and online, that advantage was invisible. The site had to explain why banker-and-broker matters to a borrower in plain language, in seconds.",
+      "InstaFi operates as both a mortgage banker and a mortgage broker with 70+ lending relationships, and online that advantage was invisible. The site had to explain why banker-and-broker matters to a borrower in plain language, in seconds.",
     approach: [
       "Message hierarchy built around banker-and-broker and rate shopping",
-      "Three clear journeys - purchase, refinance, cash-out - wired to the application portal",
+      "Three clear journeys (purchase, refinance, cash-out) wired to the application portal",
       "Calculator suite and a loan-programme index borrowers can self-serve",
       "Track record up front: two decades in lending, 12,000+ closed transactions",
     ],
@@ -48,7 +48,7 @@ export const PROJECTS: Project[] = [
     summary:
       "One roof over two businesses: a 220-person realty and mortgage company. Buying, selling and financing journeys plus a recruiting engine for agents and loan officers.",
     challenge:
-      "A large independent firm that still wants to feel boutique. The site had to serve four audiences at once - buyers, sellers, borrowers and recruits - without reading as four different websites.",
+      "A large independent firm that still wants to feel boutique. The site had to serve four audiences at once (buyers, sellers, borrowers and recruits) without reading as four different websites.",
     approach: [
       "Separate, clear journeys for buying, selling, financing and joining the team",
       "Recruiting section with agent and loan-officer testimonials and a video library",
@@ -93,7 +93,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-hcmg-loans.jpg",
     live: "https://hcmgloans.com",
     summary:
-      "A lender site that leads with a 60-second affordability estimate - no hard credit pull, no pressure - before a borrower ever talks to a loan officer.",
+      "A lender site that leads with a 60-second affordability estimate, with no hard credit pull and no pressure, before a borrower ever talks to a loan officer.",
     challenge:
       "Most borrowers spend weeks talking to lenders before understanding what they can actually afford. HCMG wanted the reverse: know your numbers first, then connect when you are ready.",
     approach: [
@@ -119,7 +119,7 @@ export const PROJECTS: Project[] = [
     summary:
       "A Maryland and DC realty team positioned around equity strategy: home-worth tooling, buyer and seller journeys, and 1,200+ Google reviews doing the talking.",
     challenge:
-      "A team with 25 years in the business and hundreds of five-star reviews was presenting like everybody else. The site needed a position - equity strategists, not just another agent - and the proof to back it.",
+      "A team with 25 years in the business and hundreds of five-star reviews was presenting like everybody else. The site needed a position (equity strategists, not just another agent) and the proof to back it.",
     approach: [
       "Positioning as MD and DC equity strategists across every page",
       "Home-worth and consultation flows as the primary calls to action",
@@ -141,7 +141,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-trueterra.jpg",
     live: "https://trueterraoils.com",
     summary:
-      "A doTERRA wellness storefront organised by goal - sleep, stress, immunity - with guided routines and a 24/7 AI guide instead of a wall of products.",
+      "A doTERRA wellness storefront organised by goal (sleep, stress, immunity) with guided routines and a 24/7 AI guide instead of a wall of products.",
     challenge:
       "New-to-oils shoppers do not buy product names, they buy outcomes. The store had to turn a huge catalogue into simple, safe routines a first-time buyer could actually follow.",
     approach: [
@@ -165,9 +165,9 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-jsamsmith.jpg",
     live: "https://www.jsamsmith.com",
     summary:
-      "A personal-brand home for an Emmy-winning tap dancer: bio, events, speaking, a tap-shoe store and booking - one stage for the artist and the business.",
+      "A personal-brand home for an Emmy-winning tap dancer: bio, events, speaking, a tap-shoe store and booking: one stage for the artist and the business.",
     challenge:
-      "An artist with a global profile needed one home for many audiences - fans, students, event bookers, shoppers - without the site reading as a brochure or as a store with extras.",
+      "An artist with a global profile needed one home for many audiences (fans, students, event bookers, shoppers) without the site reading as a brochure or as a store with extras.",
     approach: [
       "Stage-first homepage that leads with the artist",
       "Store, events, speaking and booking as first-class journeys",
@@ -234,7 +234,7 @@ export const MARQUEE_ITEMS = [
 export const STEPS = [
   {
     name: "Listen",
-    body: "We ask what you sell, who buys it, and what has already failed - and we get back to you as fast as we can. Most of our clients are in the US, but we work with teams anywhere in the world, as long as they are willing to work with us.",
+    body: "Tell us what you sell, who buys it, and what has already been tried. We reply within one working day, with questions first. Most of our clients are in the US, and we work with teams anywhere in the world.",
   },
   {
     name: "Shape",
@@ -269,18 +269,28 @@ export const VALUES = [
   },
 ];
 
-export const TESTIMONIALS = [
+/**
+ * Social proof that cannot backfire: public numbers from our clients' own
+ * websites, linked to the source. No invented quotes or names.
+ */
+export const CLIENT_PROOF = [
   {
-    quote:
-      "Our pre-approval starts tripled in a quarter. They are the first agency that showed us numbers instead of screenshots.",
-    name: "Marcus Whitfield",
-    role: "Mortgage broker, Dallas",
+    value: "12,000+",
+    label: "closed transactions across two decades in lending",
+    client: "InstaFi Home Loans",
+    href: "https://instafiloans.com",
   },
   {
-    quote:
-      "They run our launches from Lagos and we forget the distance. The store finally feels like the brand we meant to build.",
-    name: "Allyson Reed",
-    role: "E-commerce founder, Seattle",
+    value: "1,200+",
+    label: "Google reviews and counting",
+    client: "The Tab Team",
+    href: "https://thetabteam.org",
+  },
+  {
+    value: "220",
+    label: "realtors and loan officers under one roof",
+    client: "Excel Realty & Mortgage",
+    href: "https://teamerm.com",
   },
 ];
 

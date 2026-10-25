@@ -60,7 +60,7 @@ export function InvoiceSheet({ data, printButton }: { data: SheetData; printButt
             Ace<span className="text-[#B8860B]">Volumes</span>
           </p>
           <p className="mt-2 text-[12px] leading-relaxed text-[#6b5566]">
-            Websites, stores &amp; software — AceVolumes digital studio
+            Websites, stores &amp; software by AceVolumes
             <br />
             acevolumesofficial@gmail.com
           </p>
@@ -138,7 +138,7 @@ export function InvoiceSheet({ data, printButton }: { data: SheetData; printButt
       ) : null}
 
       <p className="mt-8 text-center text-[11px] text-[#9b8a97]">
-        Thank you for working with AceVolumes — we pride in delivering the very best.
+        Thank you for working with AceVolumes. We pride in delivering the very best.
       </p>
 
       {printButton ? (

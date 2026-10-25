@@ -8,7 +8,7 @@ import { NichePan } from "@/components/niche-pan";
 import { KineticHeading } from "@/components/kinetic-heading";
 import { Reveal } from "@/components/reveal";
 import { WorkStack } from "@/components/work-stack";
-import { CATALOG, MARQUEE_ITEMS, PROOF, STEPS, TESTIMONIALS, VALUES } from "@/lib/content";
+import { CATALOG, CLIENT_PROOF, MARQUEE_ITEMS, PROOF, STEPS, VALUES } from "@/lib/content";
 
 export default function Home() {
   return (
@@ -58,8 +58,8 @@ export default function Home() {
           className="max-w-[19ch] font-display text-[clamp(2.2rem,5vw,3.75rem)]"
         />
         <Reveal delay={0.08} className="mt-6 max-w-[52ch] text-[17px] leading-relaxed muted">
-          Everything below is offered today. Open a category for the full list
-          of what is inside it.
+          Everything below is offered today. Open a category for the full
+          list, then ask for one number: a fixed price with a delivery date.
         </Reveal>
 
         <div className="mt-16 grid gap-x-14 border-t hairline md:grid-cols-2">
@@ -167,21 +167,29 @@ export default function Home() {
 
           <div className="md:col-span-6 md:col-start-7">
             <div className="space-y-12">
-              {TESTIMONIALS.map((t, i) => (
+              <p className="font-mono text-[11.5px] uppercase tracking-[0.1em] muted">
+                Numbers our clients publish about themselves
+              </p>
+              {CLIENT_PROOF.map((t, i) => (
                 <Reveal
-                  key={t.name}
+                  key={t.client}
                   delay={i * 0.08}
                   className={i === 1 ? "md:pl-12" : undefined}
                 >
-                  <blockquote className="border-l-2 border-[var(--gold)] pl-6">
-                    <p className="font-display text-[clamp(1.25rem,2.3vw,1.75rem)] leading-[1.25] tracking-[-0.02em]">
-                      {t.quote}
+                  <a
+                    href={t.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="block border-l-2 border-[var(--gold)] pl-6"
+                  >
+                    <p className="font-display text-[clamp(2rem,4vw,3rem)] leading-none text-[var(--gold)] text-glow">
+                      {t.value}
                     </p>
-                    <footer className="mt-5 text-[14.5px]">
-                      <span className="font-medium">{t.name}</span>
-                      <span className="muted">, {t.role}</span>
-                    </footer>
-                  </blockquote>
+                    <p className="mt-3 max-w-[40ch] text-[15.5px] leading-relaxed">{t.label}</p>
+                    <p className="mt-2 font-mono text-[11.5px] uppercase tracking-[0.1em] muted">
+                      {t.client} ↗
+                    </p>
+                  </a>
                 </Reveal>
               ))}
             </div>
@@ -201,8 +209,9 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1} className="max-w-[42ch] lg:pb-3">
             <p className="text-[16px] leading-relaxed muted">
-              Send us a paragraph about your business. You will get a real plan
-              back, with a price and a timeline attached.
+              Send a paragraph about your business. Within one working day you
+              get a real plan back: one fixed price, one delivery date. No
+              obligation until you say go.
             </p>
             <Link
               href="/contact"

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE}/about` },
   title: "Studio",
   description:
-    "AceVolumes is a Lagos digital studio working since 2016 on brand identity, websites and social media for Nigerian businesses.",
+    "AceVolumes is a Lagos digital studio building digital systems that make results easier for clients in the US and worldwide since 2016. Deliberately small, one fixed price, one delivery date.",
 };
 
 const TIMELINE = [

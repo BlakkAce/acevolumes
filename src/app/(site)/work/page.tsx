@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE}/work` },
   title: "Work",
   description:
-    "Selected brand identity, website and social media projects from the AceVolumes studio in Lagos.",
+    "Selected websites, e-commerce stores, brand identities and custom software from the AceVolumes studio in Lagos, for clients in the US and worldwide.",
 };
 
 const SPANS = [

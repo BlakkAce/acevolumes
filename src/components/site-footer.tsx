@@ -32,7 +32,7 @@ export function SiteFooter() {
           />
           <p className="max-w-[36ch] text-[15px] leading-relaxed muted">
             We pride in delivering the very best. From Lagos, for clients
-            across the United States and the wider world — same promise, any timezone.
+            across the United States and the wider world. Same promise, any timezone.
           </p>
         </div>
 

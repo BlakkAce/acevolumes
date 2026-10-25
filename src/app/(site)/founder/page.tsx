@@ -9,8 +9,8 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: `${FOUNDER.name} — ${FOUNDER.role}`,
-  description: `Meet David Olawuni, founder of AceVolumes — a Lagos studio building digital systems that make results easier for clients worldwide since 2016.`,
+  title: `${FOUNDER.name} · ${FOUNDER.role}`,
+  description: `Meet David Olawuni, founder of AceVolumes, a Lagos studio building digital systems that make results easier for clients worldwide since 2016.`,
   alternates: { canonical: `${SITE}/founder` },
 };
 
@@ -98,8 +98,8 @@ export default function FounderPage() {
           </h2>
           <div className="mt-6 space-y-5 text-[17px] leading-relaxed muted">
             <p>
-              That small businesses — lenders, agents, brands with something
-              genuinely worth selling — were being badly served by agencies
+              That small businesses (lenders, agents, brands with something
+              genuinely worth selling) were being badly served by agencies
               that talked in vague deliverables and disappeared after
               launch. I bet that one studio, obsessed with outcomes instead
               of invoices, could hold its own against any of them.
@@ -111,13 +111,13 @@ export default function FounderPage() {
               Emmy-winning artist&apos;s store, wellness brands shipping
               across continents. Somewhere along the way we stopped just
               building websites and started building the machinery behind
-              them — a custom loan operating system, CRM pipelines,
+              them: a custom loan operating system, CRM pipelines,
               integrations between mortgage platforms.
             </p>
             <p>
               I still personally touch every engagement. The promise I make
               to every client is the one this studio runs on: a plan, a
-              fixed price, a delivery date — and work we are willing to put
+              fixed price, a delivery date, and work we are willing to put
               our name on.
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function FounderPage() {
           <div className="rounded-[4px] border hairline bg-[var(--bg-2)] p-8 md:p-10">
             <Amplitude values={MARK_VALUES} className="h-10 w-24" barClassName="bg-[var(--gold)]" />
             <p className="mt-4 font-display text-xl leading-snug md:text-2xl">
-              &ldquo;We pride in delivering the very best — for the
+              &ldquo;We pride in delivering the very best, for the
               client in front of us, and the wider world they sell to.&rdquo;
             </p>
             <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.18em] muted">

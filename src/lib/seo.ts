@@ -90,8 +90,8 @@ export function caseStudyLd(p: {
   return {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
-    name: `${p.client} — ${p.discipline}`,
-    headline: `${p.client} — ${p.discipline}`,
+    name: `${p.client}: ${p.discipline}`,
+    headline: `${p.client}: ${p.discipline}`,
     description: p.summary,
     genre: p.discipline,
     url: `${SITE}/work/${p.slug}`,
