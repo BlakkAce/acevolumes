@@ -3,7 +3,7 @@ import { SITE } from "@/lib/seo";
 
 // Site-wide social card (1200x630): plum night, gold wordmark, tagline.
 // Next attaches it automatically to every page's opengraph/twitter metadata.
-export const alt = "AceVolumes — brand, web and social for teams that sell";
+export const alt = "AceVolumes — digital systems that make results easier";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -44,14 +44,14 @@ export default function OgImage() {
           ACEVOLUMES
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ display: "flex", fontSize: 76, fontWeight: 800, lineHeight: 1.05 }}>
-            Volume that
+          <div style={{ display: "flex", fontSize: 58, fontWeight: 800, lineHeight: 1.08 }}>
+            Digital systems that
           </div>
-          <div style={{ display: "flex", fontSize: 76, fontWeight: 800, lineHeight: 1.05, color: "#F0C987" }}>
-            moves markets.
+          <div style={{ display: "flex", fontSize: 58, fontWeight: 800, lineHeight: 1.08, color: "#F0C987" }}>
+            make results easier.
           </div>
           <div style={{ display: "flex", fontSize: 30, opacity: 0.75 }}>
-            Brand · Web · Social — mortgage, real estate &amp; e-commerce
+            Web design · E-commerce · Branding · Marketing · Software
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 26, opacity: 0.6 }}>

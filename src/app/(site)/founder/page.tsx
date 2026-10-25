@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: `${FOUNDER.name} — ${FOUNDER.role}`,
-  description: `Meet the founder of AceVolumes: a Lagos-based digital studio founder working with clients worldwide since 2016 — mortgage, real estate and e-commerce brands.`,
+  description: `Meet David Olawuni, founder of AceVolumes — a Lagos studio building digital systems that make results easier for clients worldwide since 2016.`,
   alternates: { canonical: `${SITE}/founder` },
 };
 
@@ -160,7 +160,7 @@ export default function FounderPage() {
           <div className="rounded-[4px] border hairline bg-[var(--bg-2)] p-8 md:p-10">
             <Amplitude values={MARK_VALUES} className="h-10 w-24" barClassName="bg-[var(--gold)]" />
             <p className="mt-4 font-display text-xl leading-snug md:text-2xl">
-              &ldquo;We pride ourselves on delivering the very best — for the
+              &ldquo;We pride in delivering the very best — for the
               client in front of us, and the wider world they sell to.&rdquo;
             </p>
             <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.18em] muted">

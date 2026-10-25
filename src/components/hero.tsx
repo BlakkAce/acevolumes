@@ -85,8 +85,8 @@ export function Hero() {
 
           <KineticHeading
             as="h1"
-            text="Volume that moves markets."
-            className="mt-6 font-display text-[clamp(2.9rem,7.2vw,5.5rem)]"
+            text="Digital systems that make results easier."
+            className="mt-6 font-display text-[clamp(2.4rem,5.4vw,4.4rem)]"
           />
 
           <Swoosh className="mt-2 h-10 w-[min(420px,80%)]" />
@@ -98,8 +98,18 @@ export function Hero() {
             viewport={{ once: true }}
             className="mt-7 max-w-[46ch] text-[17px] leading-relaxed muted md:text-[18px]"
           >
-            Brands, websites and social engines for mortgage, real estate and
-            e-commerce teams that are tired of being overlooked.
+            One Lagos studio for teams in the US and worldwide, since 2016.
+            We pride in delivering the very best.
+          </motion.p>
+
+          <motion.p
+            variants={fade}
+            initial={reduce ? false : "hidden"}
+            whileInView="show"
+            viewport={{ once: true }}
+            className="mt-5 font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--gold)]"
+          >
+            Web design · E-commerce · Branding · Marketing · AI content · Software
           </motion.p>
 
           <motion.div

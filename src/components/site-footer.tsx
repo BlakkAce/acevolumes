@@ -31,7 +31,7 @@ export function SiteFooter() {
             className="h-14 w-auto md:h-16"
           />
           <p className="max-w-[36ch] text-[15px] leading-relaxed muted">
-            We pride ourselves on delivering the very best. From Lagos, for clients
+            We pride in delivering the very best. From Lagos, for clients
             across the United States and the wider world — same promise, any timezone.
           </p>
         </div>

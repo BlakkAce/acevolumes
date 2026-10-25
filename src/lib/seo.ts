@@ -18,7 +18,7 @@ export function organizationLd() {
     url: SITE,
     email: "acevolumesofficial@gmail.com",
     description:
-      "Lagos digital studio working since 2016 with clients worldwide. Brand identity, websites and social media for mortgage, real estate and e-commerce teams.",
+      "Lagos digital studio founded in 2016, serving clients in the US and worldwide. Digital systems that make results easier: websites, e-commerce stores, branding, marketing, AI content and custom software.",
     foundingDate: "2016",
     address: {
       "@type": "PostalAddress",

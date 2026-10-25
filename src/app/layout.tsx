@@ -28,24 +28,24 @@ export const metadata: Metadata = {
     google: "5PsjQYlCMILsjXZ3uw9Q3k9WQ1E8tKNRUGrJk7n5aow",
   },
   title: {
-    default: "AceVolumes - Volume that moves markets",
+    default: "AceVolumes | Digital Systems That Make Results Easier",
     template: "%s - AceVolumes",
   },
   description:
-    "Lagos digital studio working since 2016 with clients worldwide — from the United States to Europe, Africa and beyond. Brand identity, websites and social media for mortgage, real estate and e-commerce teams.",
+    "AceVolumes builds digital systems that make results easier — websites, e-commerce stores, branding, marketing, AI content and custom software. Lagos studio, clients worldwide since 2016.",
   openGraph: {
     title: "AceVolumes",
     description:
-      "Brand identity, website design and social media for mortgage, real estate and e-commerce brands. Lagos studio, clients worldwide, working since 2016.",
+      "Digital systems that make results easier: websites, e-commerce stores, branding, marketing, AI content and custom software. Lagos studio, clients in the US and worldwide since 2016.",
     type: "website",
     locale: "en_NG",
     siteName: "AceVolumes",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AceVolumes — Volume that moves markets",
+    title: "AceVolumes — Digital Systems That Make Results Easier",
     description:
-      "Brand identity, website design and social media for mortgage, real estate and e-commerce brands. Lagos studio, clients worldwide, working since 2016.",
+      "Websites, e-commerce stores, branding, marketing, AI content and custom software. Lagos studio, clients in the US and worldwide since 2016.",
   },
 };
 

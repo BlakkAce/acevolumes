@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "AceVolumes",
     short_name: "AceVolumes",
     description:
-      "Lagos digital studio — brand, websites and social media for mortgage, real estate and e-commerce teams worldwide.",
+      "AceVolumes — digital systems that make results easier. Websites, e-commerce, branding, marketing and custom software. Lagos studio, clients worldwide since 2016.",
     start_url: "/",
     display: "standalone",
     background_color: "#170a16",
