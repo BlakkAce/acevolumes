@@ -26,6 +26,7 @@ export function ClientStrip() {
               alt=""
               width={c.logoW ?? 160}
               height={c.logoH ?? 40}
+              sizes="150px"
               loading="lazy"
               className="h-7 w-auto max-w-[150px] object-contain brightness-0 opacity-60 transition-opacity duration-300 group-hover:opacity-100 dark:invert md:h-8"
             />

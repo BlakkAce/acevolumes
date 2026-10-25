@@ -131,17 +131,13 @@ export function Hero() {
           className="lg:col-span-6"
         >
           <TiltFrame className="relative aspect-[4/3] w-full lg:aspect-[5/5]">
-            <motion.div
-              initial={reduce ? false : { opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: DUR.slow, ease: EASE, delay: STAGGER.base }}
-              className="glow relative h-full w-full overflow-hidden rounded-[4px] border hairline"
-            >
+            <div className="glow relative h-full w-full overflow-hidden rounded-[4px] border hairline">
               <Image
                 src="/img/hero-studio.jpg"
                 alt="The AceVolumes studio at night, lit in plum and gold"
                 fill
                 priority
+                fetchPriority="high"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
@@ -156,7 +152,7 @@ export function Hero() {
                 barClassName="bg-[var(--gold)]"
                 label="AceVolumes signal band"
               />
-            </motion.div>
+            </div>
           </TiltFrame>
         </motion.div>
       </div>

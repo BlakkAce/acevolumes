@@ -13,7 +13,7 @@
   --color-plum-2: #241023;
   --color-plum-3: #170a16;
   --color-gold: #f0c987;
-  --color-gold-deep: #a06a12;
+  --color-gold-deep: #8f5f10;
   --color-cream: #f6efe3;
 
   --font-display: var(--font-archivo);
@@ -34,7 +34,7 @@
   --hairline: #e2d0b4;
   --accent: #3b153a;
   --accent-fg: #fbf4e7;
-  --gold: #a06a12;
+  --gold: #8f5f10;
   --glow: transparent;
 }
 
