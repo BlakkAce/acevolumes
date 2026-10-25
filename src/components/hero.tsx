@@ -8,8 +8,7 @@ import {
   useReducedMotion,
   useScroll,
   useSpring,
-  useTransform,
-  type Variants,
+  useTransform
 } from "motion/react";
 import { Amplitude, GROWTH_CURVE } from "@/components/amplitude";
 import { Constellation } from "@/components/constellation";
@@ -19,7 +18,7 @@ import { Swoosh } from "@/components/swoosh";
 import { TiltFrame } from "@/components/tilt-frame";
 import { useMediaQuery } from "@/components/use-media-query";
 import { ClientStrip } from "@/components/client-marquee";
-import { DUR, EASE, SCROLL_SPRING, STAGGER } from "@/lib/motion-tokens";
+import { SCROLL_SPRING } from "@/lib/motion-tokens";
 
 const Hero3D = dynamic(() => import("@/components/hero-3d").then((m) => m.Hero3D), {
   ssr: false,
@@ -50,20 +49,6 @@ export function Hero() {
   const imgScale = useSpring(useTransform(scrollYProgress, [0, 0.6], [1, 1.07]), SCROLL_SPRING);
   const imgOpacity = useTransform(scrollYProgress, [0.2, 0.6], [1, 0.35]);
 
-  const fade: Variants = {
-    hidden: reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 },
-    show: { opacity: 1, y: 0, transition: { duration: DUR.base, delay: 0.55, ease: EASE } },
-  };
-
-  const fadeLate: Variants = {
-    hidden: reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: DUR.base, delay: 0.55 + STAGGER.loose * 2, ease: EASE },
-    },
-  };
-
   return (
     <section ref={sectionRef} className="relative flex flex-col overflow-hidden border-b hairline lg:min-h-[calc(100dvh-72px)]">
       {field3d ? <Hero3D target={sectionRef} /> : <Constellation />}
@@ -73,15 +58,12 @@ export function Hero() {
           style={reduce ? undefined : { y: copyY, opacity: copyOpacity }}
           className="lg:col-span-6"
         >
-          <motion.p
-            variants={fade}
-            initial={reduce ? false : "hidden"}
-            whileInView="show"
-            viewport={{ once: true }}
-            className="font-mono text-[12px] uppercase tracking-[0.12em] muted"
+          <p
+            className="anim-enter font-mono text-[12px] uppercase tracking-[0.12em] muted"
+            style={{ animationDelay: "80ms" }}
           >
-            Lagos studio. Clients worldwide — US, Europe, Africa and beyond.
-          </motion.p>
+            Lagos studio. Clients worldwide: US, Europe, Africa and beyond.
+          </p>
 
           <KineticHeading
             as="h1"
@@ -91,39 +73,30 @@ export function Hero() {
 
           <Swoosh className="mt-2 h-10 w-[min(420px,80%)]" />
 
-          <motion.p
-            variants={fade}
-            initial={reduce ? false : "hidden"}
-            whileInView="show"
-            viewport={{ once: true }}
-            className="mt-7 max-w-[46ch] text-[17px] leading-relaxed muted md:text-[18px]"
+          <p
+            className="anim-enter mt-7 max-w-[46ch] text-[17px] leading-relaxed muted md:text-[18px]"
+            style={{ animationDelay: "560ms" }}
           >
             One Lagos studio for teams in the US and worldwide, since 2016.
             We pride in delivering the very best.
-          </motion.p>
+          </p>
 
-          <motion.p
-            variants={fade}
-            initial={reduce ? false : "hidden"}
-            whileInView="show"
-            viewport={{ once: true }}
-            className="mt-5 font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--gold)]"
+          <p
+            className="anim-enter mt-5 font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--gold)]"
+            style={{ animationDelay: "700ms" }}
           >
             Web design · E-commerce · Branding · Marketing · AI content · Software
-          </motion.p>
+          </p>
 
-          <motion.div
-            variants={fadeLate}
-            initial={reduce ? false : "hidden"}
-            whileInView="show"
-            viewport={{ once: true }}
-            className="mt-10 flex flex-wrap items-center gap-4"
+          <div
+            className="anim-enter mt-10 flex flex-wrap items-center gap-4"
+            style={{ animationDelay: "820ms" }}
           >
             <MagneticLink href="/contact">Start a project</MagneticLink>
             <MagneticLink href="/work" variant="outline">
               See the work
             </MagneticLink>
-          </motion.div>
+          </div>
         </motion.div>
 
         <motion.div
