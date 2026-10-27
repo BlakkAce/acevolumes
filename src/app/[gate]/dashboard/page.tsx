@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { and, desc, eq, inArray, lte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lte, ne, sql } from "drizzle-orm";
 import { connection } from "next/server";
 import { getDb, dbConfigured } from "@/lib/db";
-import { clients, interactions, invoices } from "@/lib/db/schema";
+import { clients, interactions, invoices, pageviews } from "@/lib/db/schema";
 import {
   OPEN_STATUSES,
   STATUSES,
@@ -29,6 +29,96 @@ function Shell({ children }: { children: React.ReactNode }) {
       </p>
       {children}
     </div>
+  );
+}
+
+async function TrafficSection({ base }: { base: string }) {
+  const db = getDb();
+  const since = sql`now() - interval '7 days'`;
+  const [totals] = await db
+    .select({
+      humans: sql<number>`count(*) filter (where ${pageviews.isBot} = false)`,
+      bots: sql<number>`count(*) filter (where ${pageviews.isBot} = true)`,
+    })
+    .from(pageviews)
+    .where(gte(pageviews.createdAt, since));
+  const topPaths = await db
+    .select({ path: pageviews.path, n: sql<number>`count(*)` })
+    .from(pageviews)
+    .where(and(gte(pageviews.createdAt, since), eq(pageviews.isBot, false)))
+    .groupBy(pageviews.path)
+    .orderBy(desc(sql`count(*)`))
+    .limit(5);
+  const topRefs = await db
+    .select({ referrer: pageviews.referrer, n: sql<number>`count(*)` })
+    .from(pageviews)
+    .where(and(gte(pageviews.createdAt, since), eq(pageviews.isBot, false), ne(pageviews.referrer, "")))
+    .groupBy(pageviews.referrer)
+    .orderBy(desc(sql`count(*)`))
+    .limit(5);
+
+  return (
+    <section
+      className="mt-6 rounded-2xl border p-5"
+      style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}
+    >
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wider opacity-60">
+          Traffic, last 7 days
+        </h2>
+        <a href={`${base}/clients`} className="text-xs opacity-40">
+          first-party, cookieless
+        </a>
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Visits</p>
+          <p className="mt-1 text-2xl font-semibold tabular-nums">{Number(totals?.humans ?? 0)}</p>
+        </div>
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Search crawler hits</p>
+          <p className="mt-1 text-2xl font-semibold tabular-nums">{Number(totals?.bots ?? 0)}</p>
+        </div>
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Referrer sources</p>
+          <p className="mt-1 text-2xl font-semibold tabular-nums">{topRefs.length}</p>
+        </div>
+      </div>
+      {topPaths.length > 0 ? (
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Top pages</p>
+            <ul className="mt-2 space-y-1 text-sm tabular-nums">
+              {topPaths.map((r) => (
+                <li key={r.path} className="flex justify-between gap-4">
+                  <span className="truncate opacity-80">{r.path}</span>
+                  <span>{Number(r.n)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Top referrers</p>
+            {topRefs.length === 0 ? (
+              <p className="mt-2 text-sm opacity-40">None yet: shares and links will appear here.</p>
+            ) : (
+              <ul className="mt-2 space-y-1 text-sm tabular-nums">
+                {topRefs.map((r) => (
+                  <li key={r.referrer} className="flex justify-between gap-4">
+                    <span className="truncate opacity-80">{r.referrer}</span>
+                    <span>{Number(r.n)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : (
+        <p className="mt-3 text-sm opacity-40">
+          No visits logged yet. Share the site: every view lands here.
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -262,6 +352,10 @@ async function Overview({ p }: { p: Promise<{ gate: string }> }) {
           </p>
         </a>
       </div>
+
+      <Suspense fallback={null}>
+        <TrafficSection base={base} />
+      </Suspense>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section>

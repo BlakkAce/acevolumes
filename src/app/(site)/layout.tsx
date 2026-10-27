@@ -2,6 +2,7 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { PageTransition } from "@/components/page-transition";
+import { AnalyticsBeacon } from "@/components/analytics-beacon";
 
 // Public marketing site chrome. The studio dashboard ([gate]) deliberately
 // lives outside this group so it never renders the public navigation.
@@ -23,6 +24,7 @@ export default function SiteLayout({
         <PageTransition>{children}</PageTransition>
       </main>
       <SiteFooter />
+      <AnalyticsBeacon />
     </>
   );
 }

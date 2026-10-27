@@ -2,6 +2,7 @@ import {
   integer,
   numeric,
   pgTable,
+  boolean,
   serial,
   text,
   timestamp,
@@ -63,4 +64,14 @@ export const invoiceItems = pgTable("invoice_items", {
   description: text("description").notNull(),
   qty: numeric("qty", { precision: 10, scale: 2 }).notNull().default("1"),
   unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull().default("0"),
+});
+
+/** First-party pageview log. No cookies, no IPs: path, referrer, device class. */
+export const pageviews = pgTable("pageviews", {
+  id: serial("id").primaryKey(),
+  path: text("path").notNull(),
+  referrer: text("referrer").notNull().default(""),
+  device: text("device").notNull().default("desktop"),
+  isBot: boolean("is_bot").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
