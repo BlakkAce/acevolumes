@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
   AceVolumes brand tokens, sampled from the two logo files.
@@ -38,18 +37,7 @@
   --glow: transparent;
 }
 
-[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #170a16;
-  --bg-2: #200d1e;
-  --fg: #f6efe3;
-  --fg-muted: #b39aad;
-  --hairline: #3c2239;
-  --accent: #f0c987;
-  --accent-fg: #2a1029;
-  --gold: #f0c987;
-  --glow: 0 0 24px rgba(240, 201, 135, 0.28);
-}
+/* Dark mode removed by decision: the brand renders in light only. */
 
 html {
   -webkit-text-size-adjust: 100%;

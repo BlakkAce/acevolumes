@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "AceVolumes: digital systems that make results easier. Websites, e-commerce, branding, marketing and custom software. Lagos studio, clients worldwide since 2016.",
     start_url: "/",
     display: "standalone",
-    background_color: "#170a16",
-    theme_color: "#170a16",
+    background_color: "#fbf7ee",
+    theme_color: "#fbf7ee",
     icons: [{ src: "/icon.png", sizes: "512x512", type: "image/png" }],
   };
 }

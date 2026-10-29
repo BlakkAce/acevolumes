@@ -4,9 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { List, X, Sun, Moon } from "@phosphor-icons/react/dist/ssr";
+import { List, X } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
-import { useTheme } from "@/components/theme-provider";
 
 const LINKS = [
   { href: "/work", label: "Work" },
@@ -18,7 +17,6 @@ const LINKS = [
 
 export function SiteNav() {
   const pathname = usePathname();
-  const { toggle } = useTheme();
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
 
@@ -35,19 +33,11 @@ export function SiteNav() {
         <div className="mx-auto flex h-[72px] w-full max-w-[1400px] items-center justify-between gap-6 px-5 md:px-8">
           <Link href="/" className="flex items-center" aria-label="AceVolumes home">
             <Image
-              src="/brand/logo-cream.png"
-              alt=""
-              aria-hidden
-              width={311}
-              height={207}
-              className="hidden h-9 w-auto dark:block"
-            />
-            <Image
               src="/brand/logo-ink.png"
               alt="AceVolumes"
               width={311}
               height={207}
-              className="block h-9 w-auto dark:hidden"
+              className="block h-9 w-auto"
             />
           </Link>
 
@@ -70,16 +60,6 @@ export function SiteNav() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label="Toggle colour theme"
-              className="flex h-10 w-10 items-center justify-center rounded-full border hairline transition-colors duration-200 hover:border-[var(--accent)] hover:text-[var(--accent)]"
-            >
-              {/* Pure CSS theme switch keeps server and client markup identical. */}
-              <Sun size={16} className="hidden dark:block" aria-hidden />
-              <Moon size={16} className="block dark:hidden" aria-hidden />
-            </button>
             <Link
               href="/contact"
               className="hidden rounded-full bg-[var(--fg)] px-5 py-2.5 font-mono text-[12.5px] uppercase tracking-[0.09em] text-[var(--bg)] transition-colors duration-200 hover:bg-[var(--accent)] hover:text-[var(--accent-fg)] md:inline-block"
