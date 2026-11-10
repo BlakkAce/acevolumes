@@ -103,11 +103,11 @@ export function Hero() {
           style={reduce ? undefined : { scale: imgScale, opacity: imgOpacity }}
           className="lg:col-span-6"
         >
-          <TiltFrame className="relative aspect-[4/3] w-full lg:aspect-[5/5]">
+          <TiltFrame className="relative aspect-square w-full">
             <div className="glow relative h-full w-full overflow-hidden rounded-[4px] border hairline">
               <Image
-                src="/img/hero-studio.jpg"
-                alt="The AceVolumes studio at night, lit in plum and gold"
+                src="/img/founder.jpg"
+                alt="David Olawuni, founder of AceVolumes"
                 fill
                 priority
                 fetchPriority="high"
