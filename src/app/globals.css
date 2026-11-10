@@ -15,9 +15,6 @@
   --color-gold-deep: #8f5f10;
   --color-cream: #f6efe3;
 
-  --font-display: var(--font-archivo);
-  --font-body: var(--font-hanken);
-  --font-mono: var(--font-space);
 
   --radius-card: 4px;
 
@@ -45,6 +42,11 @@ html {
 }
 
 body {
+  /* Font aliases live on body so they can see the next/font variables,
+     which are attached to <body> by the font class names. */
+  --font-display: var(--font-archivo);
+  --font-body: var(--font-hanken);
+  --font-mono: var(--font-space);
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-body), system-ui, sans-serif;

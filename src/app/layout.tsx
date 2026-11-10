@@ -1,22 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Hanken_Grotesk, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import { SITE } from "@/lib/seo";
 import "./globals.css";
 
-const archivo = Archivo({
-  subsets: ["latin"],
+// Fonts are vendored in src/fonts (variable, latin subset): nothing loads
+// from Google or any third party, in the browser or at build time.
+const archivo = localFont({
+  src: "../fonts/archivo-variable-latin.woff2",
+  weight: "100 900",
+  style: "normal",
   variable: "--font-archivo",
   display: "swap",
 });
 
-const hanken = Hanken_Grotesk({
-  subsets: ["latin"],
+const hanken = localFont({
+  src: "../fonts/hanken-grotesk-variable-latin.woff2",
+  weight: "100 900",
+  style: "normal",
   variable: "--font-hanken",
   display: "swap",
 });
 
-const space = Space_Grotesk({
-  subsets: ["latin"],
+const space = localFont({
+  src: "../fonts/space-grotesk-variable-latin.woff2",
+  weight: "300 700",
+  style: "normal",
   variable: "--font-space",
   display: "swap",
 });
