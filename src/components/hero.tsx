@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
 import {
@@ -10,12 +9,10 @@ import {
   useSpring,
   useTransform
 } from "motion/react";
-import { Amplitude, GROWTH_CURVE } from "@/components/amplitude";
 import { Constellation } from "@/components/constellation";
 import { KineticHeading } from "@/components/kinetic-heading";
 import { MagneticLink } from "@/components/magnetic-link";
 import { Swoosh } from "@/components/swoosh";
-import { TiltFrame } from "@/components/tilt-frame";
 import { useMediaQuery } from "@/components/use-media-query";
 import { ClientStrip } from "@/components/client-marquee";
 import { SCROLL_SPRING } from "@/lib/motion-tokens";
@@ -46,8 +43,6 @@ export function Hero() {
   // Scroll exit: content drifts up and recedes as the next section arrives.
   const copyY = useSpring(useTransform(scrollYProgress, [0.12, 0.55], [0, -70]), SCROLL_SPRING);
   const copyOpacity = useTransform(scrollYProgress, [0.12, 0.5], [1, 0]);
-  const imgScale = useSpring(useTransform(scrollYProgress, [0, 0.6], [1, 1.07]), SCROLL_SPRING);
-  const imgOpacity = useTransform(scrollYProgress, [0.2, 0.6], [1, 0.35]);
 
   return (
     <section ref={sectionRef} className="relative flex flex-col overflow-hidden border-b hairline lg:min-h-[calc(100dvh-72px)]">
@@ -56,7 +51,7 @@ export function Hero() {
       <div className="relative mx-auto grid w-full max-w-[1400px] flex-1 grid-cols-1 content-center gap-y-10 px-5 pb-8 pt-12 md:px-8 md:pb-10 md:pt-14 lg:grid-cols-12 lg:items-center lg:gap-x-12">
         <motion.div
           style={reduce ? undefined : { y: copyY, opacity: copyOpacity }}
-          className="lg:col-span-6"
+          className="lg:col-span-10"
         >
           <p
             className="anim-enter font-mono text-[12px] uppercase tracking-[0.12em] muted"
@@ -99,35 +94,6 @@ export function Hero() {
           </div>
         </motion.div>
 
-        <motion.div
-          style={reduce ? undefined : { scale: imgScale, opacity: imgOpacity }}
-          className="lg:col-span-6"
-        >
-          <TiltFrame className="relative aspect-square w-full">
-            <div className="glow relative h-full w-full overflow-hidden rounded-[4px] border hairline">
-              <Image
-                src="/img/founder.jpg"
-                alt="David Olawuni, founder of AceVolumes"
-                fill
-                priority
-                fetchPriority="high"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent opacity-70 lg:opacity-40"
-              />
-              <Amplitude
-                values={GROWTH_CURVE}
-                animate
-                className="absolute bottom-6 left-6 right-6 h-12 lg:left-8 lg:right-8"
-                barClassName="bg-[var(--gold)]"
-                label="AceVolumes signal band"
-              />
-            </div>
-          </TiltFrame>
-        </motion.div>
       </div>
 
       {/* Worked-with strip: on screen the moment the page loads. */}
