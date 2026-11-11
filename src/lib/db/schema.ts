@@ -126,3 +126,10 @@ export const agentRuns = pgTable("agent_runs", {
   meta: text("meta"), // JSON string payload for auditing
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const mediaAssets = pgTable("media_assets", {
+  id: text("id").primaryKey(), // unguessable token, served at /api/media/<id>
+  mime: text("mime").notNull().default("image/png"),
+  data: text("data").notNull(), // base64 bytes; served publicly for Buffer/API fetches
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

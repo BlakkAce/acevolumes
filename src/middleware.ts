@@ -39,6 +39,8 @@ export function middleware(req: NextRequest) {
     pathname.startsWith("/api/track") ||
     pathname.startsWith("/api/cron") ||
     pathname.startsWith("/api/social") ||
+    pathname.startsWith("/api/media") ||
+    pathname.startsWith("/api/social/preview") ||
     pathname.startsWith("/invoice/") ||
     // Generated metadata routes (opengraph-image, icons): extensionless.
     pathname.startsWith("/opengraph-image") ||

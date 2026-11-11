@@ -3,6 +3,8 @@ import { and, eq, lte } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { agentRuns, posts } from "@/lib/db/schema";
 import { isConnected, post } from "@/lib/social/platforms";
+import { bufferProfileFor, bufferCreate, bufferToken } from "@/lib/social/buffer";
+import { ensureMediaUrl } from "@/lib/media/cards";
 import { PLATFORMS } from "@/lib/agents/scribe";
 
 // Vercel Cron: daily 06:00 UTC. Posts every approved post that is due.
@@ -29,12 +31,47 @@ export async function GET(req: Request) {
     .where(and(eq(posts.status, "approved"), lte(posts.scheduledFor, now)));
 
   const posted: number[] = [];
+  const buffered: number[] = [];
   const waiting: { platform: string; count: number }[] = [];
   const failed: { id: number; detail: string }[] = [];
+
+  // Delivery preference: Buffer (one token, owns all platform connections);
+  // direct platform APIs remain as fallback for the future.
+  const useBuffer = Boolean(bufferToken());
 
   for (const platform of PLATFORMS) {
     const rows = due.filter((p) => p.platform === platform);
     if (rows.length === 0) continue;
+    if (useBuffer) {
+      const profileId = await bufferProfileFor(platform);
+      if (!profileId) {
+        waiting.push({ platform, count: rows.length });
+        continue;
+      }
+      for (const row of rows) {
+        const photoUrl = await ensureMediaUrl(row.mediaRef, row.id);
+        const outcome = await bufferCreate({
+          profileId,
+          text: row.content,
+          scheduledAt: row.scheduledFor,
+          photoUrl,
+        });
+        if (outcome.ok) {
+          await db
+            .update(posts)
+            .set({ status: "buffered", postedUrl: `buffer:${outcome.updateId}`, error: null })
+            .where(eq(posts.id, row.id));
+          buffered.push(row.id);
+        } else {
+          await db
+            .update(posts)
+            .set({ status: "failed", error: `buffer: ${outcome.error.slice(0, 140)}` })
+            .where(eq(posts.id, row.id));
+          failed.push({ id: row.id, detail: outcome.error.slice(0, 60) });
+        }
+      }
+      continue;
+    }
     if (!(await isConnected(platform))) {
       waiting.push({ platform, count: rows.length });
       continue;
@@ -57,7 +94,7 @@ export async function GET(req: Request) {
     }
   }
 
-  const summary = `Scheduler sweep: ${posted.length} posted, ${waiting
+  const summary = `Scheduler sweep: ${buffered.length} buffered, ${posted.length} posted direct, ${waiting
     .map((w) => `${w.count} waiting on ${w.platform}`)
     .join(", ") || "none waiting"}, ${failed.length} failed.`;
   await db.insert(agentRuns).values({
@@ -67,5 +104,5 @@ export async function GET(req: Request) {
     meta: JSON.stringify({ posted, waiting, failed }),
   });
 
-  return NextResponse.json({ ok: true, posted, waiting, failed });
+  return NextResponse.json({ ok: true, buffered, posted, waiting, failed });
 }

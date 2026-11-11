@@ -3,8 +3,11 @@ import { asc, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { getDb, dbConfigured } from "@/lib/db";
-import { posts, socialAccounts } from "@/lib/db/schema";
+import { posts, socialAccounts, agentRuns } from "@/lib/db/schema";
+import { bufferProfileFor, bufferCreate, bufferToken } from "@/lib/social/buffer";
+import { ensureMediaUrl } from "@/lib/media/cards";
 import { draftWeek, PLATFORMS } from "@/lib/agents/scribe";
 import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { verifySessionToken } from "@/lib/studio/session";
@@ -40,6 +43,7 @@ const STATUS_TINT: Record<string, string> = {
   approved: "#1a7a4d",
   rejected: "#a33",
   posted: "var(--accent)",
+  buffered: "#1a7a4d",
   failed: "#a33",
 };
 
@@ -77,6 +81,56 @@ async function saveEdit(formData: FormData) {
   if (!Number.isSafeInteger(id) || content.length < 4) return;
   const db = getDb();
   await db.update(posts).set({ content }).where(inArray(posts.id, [id]));
+  revalidatePath(`/${STUDIO_PATH}/content`);
+}
+
+async function pushToBuffer() {
+  "use server";
+  if (!dbConfigured() || !bufferToken()) return;
+  const db = getDb();
+  const now = new Date();
+  const horizon = new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000);
+  const due = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.status, "approved"),
+        gte(posts.scheduledFor, now),
+        lte(posts.scheduledFor, horizon),
+      ),
+    );
+  let pushed = 0;
+  const errors: string[] = [];
+  for (const row of due) {
+    const profileId = await bufferProfileFor(row.platform);
+    if (!profileId) {
+      errors.push(`${row.platform}: no Buffer channel connected`);
+      continue;
+    }
+    const photoUrl = await ensureMediaUrl(row.mediaRef, row.id);
+    const outcome = await bufferCreate({
+      profileId,
+      text: row.content,
+      scheduledAt: row.scheduledFor,
+      photoUrl,
+    });
+    if (outcome.ok) {
+      await db
+        .update(posts)
+        .set({ status: "buffered", postedUrl: `buffer:${outcome.updateId}`, error: null })
+        .where(eq(posts.id, row.id));
+      pushed += 1;
+    } else {
+      errors.push(`${row.platform}: ${outcome.error.slice(0, 80)}`);
+    }
+  }
+  await db.insert(agentRuns).values({
+    agent: "scribe",
+    summary: `Manual Buffer push: ${pushed} sent${errors.length ? `, ${errors.length} failed` : ""}.`,
+    status: errors.length > 0 && pushed === 0 ? "error" : "ok",
+    meta: JSON.stringify({ pushed, errors }),
+  });
   revalidatePath(`/${STUDIO_PATH}/content`);
 }
 
@@ -150,6 +204,11 @@ async function Content({ p }: { p: Promise<{ gate: string }> }) {
           <a href={`${base}/settings`} className={btn}>
             Connections
           </a>
+          <form action={pushToBuffer}>
+            <button type="submit" className="rounded-lg border px-3 py-1.5 text-sm font-semibold">
+              Push week to Buffer
+            </button>
+          </form>
           <form action={generate}>
             <button
               type="submit"
@@ -216,6 +275,17 @@ async function Content({ p }: { p: Promise<{ gate: string }> }) {
                       </span>
                     </div>
                     <p className="mt-2 whitespace-pre-line text-sm">{r.content}</p>
+                    {r.status !== "posted" ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- tiny admin-queue preview, not user-facing LCP
+                      <img
+                        src={`/api/social/preview?ref=${encodeURIComponent(r.mediaRef ?? "")}&id=${r.id}`}
+                        alt=""
+                        width={88}
+                        height={88}
+                        className="mt-2 rounded-lg border"
+                        style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}
+                      />
+                    ) : null}
                     <div className="mt-2 text-xs opacity-50">
                       {r.mediaRef ? `media: ${r.mediaRef}` : "no media"}
                       {r.postedUrl ? ` · ${r.postedUrl}` : ""}

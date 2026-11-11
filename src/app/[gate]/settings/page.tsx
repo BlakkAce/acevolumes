@@ -10,7 +10,9 @@ import { verifySessionToken } from "@/lib/studio/session";
 import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
 import { isConfigured } from "@/lib/social/oauth";
-import { metaOf } from "@/lib/social/store";
+import { metaOf, saveConnection } from "@/lib/social/store";
+import { bufferChannels, bufferToken } from "@/lib/social/buffer";
+import { agentRuns } from "@/lib/db/schema";
 
 // Auth-gated studio page: block instead of streaming a shell.
 export const instant = false;
@@ -27,6 +29,38 @@ function Shell({ children }: { children: React.ReactNode }) {
       {children}
     </div>
   );
+}
+
+async function syncBuffer() {
+  "use server";
+  if (!dbConfigured() || !bufferToken()) return;
+  const db = getDb();
+  let n = 0;
+  try {
+    const channels = await bufferChannels();
+    for (const ch of channels) {
+      await saveConnection({
+        platform: ch.platform,
+        handle: ch.handle,
+        accessToken: "via-buffer",
+        meta: { bufferProfileId: ch.id },
+      });
+      n += 1;
+    }
+    await db.insert(agentRuns).values({
+      agent: "scribe",
+      summary: `Buffer sync: ${n} channel${n === 1 ? "" : "s"} mapped.`,
+      status: "ok",
+      meta: JSON.stringify({ n }),
+    });
+  } catch (e) {
+    await db.insert(agentRuns).values({
+      agent: "scribe",
+      summary: `Buffer sync failed: ${e instanceof Error ? e.message.slice(0, 120) : "unknown"}`,
+      status: "error",
+    });
+  }
+  revalidatePath(`/${STUDIO_PATH}/settings`);
 }
 
 async function disconnect(formData: FormData) {
@@ -134,7 +168,47 @@ async function Settings({ p }: { p: Promise<{ gate: string }> }) {
       ) : null}
 
       <h2 className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] opacity-50">
-        Social connections
+        Buffer (delivery)
+      </h2>
+      <div className="mt-3 rounded-2xl border p-4" style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-sm font-semibold">Buffer account</p>
+            <p className="mt-1 text-sm opacity-60">
+              Approved posts are delivered to Buffer, which owns the platform
+              connections and does the actual posting.
+            </p>
+          </div>
+          <span
+            className="rounded-full px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider"
+            style={{ color: bufferToken() ? "#1a7a4d" : "var(--fg-muted)" }}
+          >
+            {bufferToken() ? "token detected" : "no token"}
+          </span>
+        </div>
+        <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm opacity-70">
+          <li>Create a free Buffer account as acevolumesofficial@gmail.com and connect your Facebook Page, Instagram and X channels inside Buffer (its own UI, no developer consoles).</li>
+          <li>At publish.buffer.com/settings/api generate an API token.</li>
+          <li>Add it to Vercel as BUFFER_ACCESS_TOKEN and redeploy.</li>
+          <li>Tap Sync channels below: your Buffer channels appear as connected platforms here.</li>
+        </ol>
+        <form action={syncBuffer} className="mt-3">
+          <button
+            type="submit"
+            className="rounded-lg px-3 py-1.5 text-sm font-semibold"
+            style={{
+              background: bufferToken() ? "var(--accent)" : "transparent",
+              color: bufferToken() ? "var(--accent-fg)" : "var(--fg-muted)",
+            }}
+            disabled={!bufferToken()}
+          >
+            Sync channels
+          </button>
+        </form>
+      </div>
+
+      <h2 className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] opacity-50">
+        Social connections (Buffer or direct APIs)
       </h2>
       <div className="mt-3 grid gap-3">
         {PLATFORMS.map((platform) => {
