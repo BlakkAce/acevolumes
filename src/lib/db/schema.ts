@@ -99,7 +99,8 @@ export const posts = pgTable("posts", {
   mediaRef: text("media_ref"), // /img/... asset attached at post time
   link: text("link"),
   scheduledFor: timestamp("scheduled_for", { withTimezone: true }).notNull(),
-  status: text("status").notNull().default("draft"), // draft | approved | rejected | posted | failed
+  status: text("status").notNull().default("draft"), // draft | approved | rejected | buffered | posted | failed
+  hookVariants: text("hook_variants"), // JSON array: alternative full post versions (different hooks)
   postedUrl: text("posted_url"),
   error: text("error"),
   createdBy: text("created_by").notNull().default("scribe"),

@@ -180,16 +180,60 @@ function themeFor(dayIndex: number): Theme {
   };
 }
 
-function render(p: Platform, t: Theme): string {
-  if (p === "linkedin") return `${t.long}\n\n${t.hashtags.join(" ")}`;
-  if (p === "facebook")
-    return t.short.startsWith(BRAND_LINE) ? t.short : `${t.short}\n\n${BRAND_LINE}`;
+/** Alternative first-line hooks per theme kind (playbook types; no invented facts). */
+function altHooks(t: Theme): string[] {
+  if (t.kind === "case") {
+    const name = t.short.match(/New work: ([^.]+)\./)?.[1] ?? "the client";
+    return [
+      `The site that wins trust before the first call: ${name}.`,
+      `${name} needed a site that closes, not a site that exists. Here is what we built.`,
+    ];
+  }
+  if (t.kind === "service") {
+    return [
+      "One hour of your time. We build the rest.",
+      "Your competitors published this week. Did you?",
+    ];
+  }
+  if (t.kind === "insight") {
+    return [
+      "You do not need more traffic. You need the right page.",
+      "Most sites lose the sale in the first two seconds.",
+    ];
+  }
+  if (t.kind === "founder") {
+    return [
+      "No account managers. No handoffs. The founder builds it himself.",
+      "Small studio, senior hands. That is the whole model.",
+    ];
+  }
+  return [
+    "Digital systems that make results easier. That is the entire job.",
+    "Websites that sell while you sleep: that is the deliverable.",
+  ];
+}
+
+/** Prepend a different first line, replacing the original first line. */
+function withHook(body: string, hook: string): string {
+  const rest = body.includes("\n\n") ? body.slice(body.indexOf("\n\n") + 2) : "";
+  return rest ? `${hook}\n\n${rest}` : hook;
+}
+
+function render(p: Platform, t: Theme, hookIndex = -1): string {
+  if (p === "linkedin")
+    return `${hookIndex >= 0 ? withHook(t.long, altHooks(t)[hookIndex]) : t.long}\n\n${t.hashtags.join(" ")}`;
+  if (p === "facebook") {
+    const body = t.short.startsWith(BRAND_LINE) ? t.short : `${t.short}\n\n${BRAND_LINE}`;
+    const alt = hookIndex >= 0 ? withHook(body, altHooks(t)[hookIndex]) : body;
+    return alt.startsWith(BRAND_LINE) || alt.includes(`\n\n${BRAND_LINE}`) ? alt : `${alt}\n\n${BRAND_LINE}`;
+  }
   if (p === "instagram") {
     const body = t.short.split(" See it")[0].split(" Tell us")[0];
-    return `${body}\n.\n${t.hashtags.join(" ")}`;
+    const alt = hookIndex >= 0 ? withHook(body, altHooks(t)[hookIndex]) : body;
+    return `${alt}\n.\n${t.hashtags.join(" ")}`;
   }
   // x: hard ceiling 280
-  const raw = t.short;
+  const raw = hookIndex >= 0 ? withHook(t.short, altHooks(t)[hookIndex]) : t.short;
   return raw.length <= 280 ? raw : `${raw.slice(0, 277)}...`;
 }
 
@@ -237,8 +281,12 @@ export async function draftWeek(now = new Date()): Promise<ScribeResult> {
         skipped += 1;
         continue;
       }
+      const variants = [0, 1]
+        .map((i) => render(p, t, i))
+        .filter((v) => (p === "x" ? v.length <= 280 : true));
       await db.insert(posts).values({
         platform: p,
+        hookVariants: variants.length > 0 ? JSON.stringify(variants) : null,
         content,
         mediaRef: t.mediaRef,
         link: t.link,

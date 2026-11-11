@@ -135,6 +135,30 @@ async function pushToBuffer() {
   revalidatePath(`/${STUDIO_PATH}/content`);
 }
 
+async function useHookVariant(formData: FormData) {
+  "use server";
+  const id = Number(formData.get("id"));
+  const idx = Number(formData.get("idx"));
+  if (!Number.isSafeInteger(id) || !Number.isSafeInteger(idx)) return;
+  const db = getDb();
+  const [row] = await db.select().from(posts).where(eq(posts.id, id)).limit(1);
+  if (!row || !row.hookVariants || row.status === "posted" || row.status === "buffered") return;
+  let variants: string[] = [];
+  try {
+    variants = JSON.parse(row.hookVariants) as string[];
+  } catch {
+    return;
+  }
+  if (idx < 0 || idx >= variants.length) return;
+  const chosen = variants[idx];
+  variants[idx] = row.content;
+  await db
+    .update(posts)
+    .set({ content: chosen, hookVariants: JSON.stringify(variants) })
+    .where(eq(posts.id, id));
+  revalidatePath(`/${STUDIO_PATH}/content`);
+}
+
 async function generate() {
   "use server";
   if (!dbConfigured()) return;
@@ -292,6 +316,33 @@ async function Content({ p }: { p: Promise<{ gate: string }> }) {
                       {r.postedUrl ? ` · ${r.postedUrl}` : ""}
                       {r.error ? ` · ${r.error}` : ""}
                     </div>
+                    {r.hookVariants && r.status !== "posted" && r.status !== "buffered" ? (
+                        <details className="mt-2">
+                          <summary className="cursor-pointer text-xs opacity-60">
+                            Hook variants ({(() => { try { return (JSON.parse(r.hookVariants) as string[]).length; } catch { return 0; } })()}) — swap the opening line
+                          </summary>
+                          <div className="mt-2 grid gap-2">
+                            {(() => {
+                              try {
+                                return (JSON.parse(r.hookVariants) as string[]).map((v, i) => (
+                                  <form key={i} action={useHookVariant} className="flex items-start gap-2">
+                                    <input type="hidden" name="id" value={r.id} />
+                                    <input type="hidden" name="idx" value={i} />
+                                    <span className="rounded border p-2 text-xs opacity-80" style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)", whiteSpace: "pre-line" }}>
+                                      {v.length > 160 ? `${v.slice(0, 160)}…` : v}
+                                    </span>
+                                    <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs opacity-75 hover:opacity-100">
+                                      Use
+                                    </button>
+                                  </form>
+                                ));
+                              } catch {
+                                return null;
+                              }
+                            })()}
+                          </div>
+                        </details>
+                      ) : null}
                     <div className="mt-3 flex flex-wrap gap-2">
                       {r.status !== "approved" && r.status !== "posted" ? (
                         <form action={approve}>
