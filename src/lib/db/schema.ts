@@ -75,3 +75,53 @@ export const pageviews = pgTable("pageviews", {
   isBot: boolean("is_bot").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ---------------------------------------------------------------------------
+// Autonomy layer (Phase 5): social autopilot + agent runs.
+// Agents write drafts here; only approval moves a post to the scheduler.
+
+export const socialAccounts = pgTable("social_accounts", {
+  id: serial("id").primaryKey(),
+  platform: text("platform").notNull().unique(), // facebook | instagram | x | linkedin
+  handle: text("handle"),
+  status: text("status").notNull().default("disconnected"), // disconnected | connected | expired
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  platform: text("platform").notNull(), // facebook | instagram | x | linkedin
+  content: text("content").notNull(),
+  mediaRef: text("media_ref"), // /img/... asset attached at post time
+  link: text("link"),
+  scheduledFor: timestamp("scheduled_for", { withTimezone: true }).notNull(),
+  status: text("status").notNull().default("draft"), // draft | approved | rejected | posted | failed
+  postedUrl: text("posted_url"),
+  error: text("error"),
+  createdBy: text("created_by").notNull().default("scribe"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const postMetrics = pgTable("post_metrics", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id")
+    .notNull()
+    .references(() => posts.id, { onDelete: "cascade" }),
+  capturedAt: timestamp("captured_at", { withTimezone: true }).notNull().defaultNow(),
+  impressions: integer("impressions").notNull().default(0),
+  likes: integer("likes").notNull().default(0),
+  comments: integer("comments").notNull().default(0),
+  shares: integer("shares").notNull().default(0),
+});
+
+export const agentRuns = pgTable("agent_runs", {
+  id: serial("id").primaryKey(),
+  agent: text("agent").notNull(), // scribe | scout | analyst | bookkeeper | concierge
+  summary: text("summary").notNull(),
+  status: text("status").notNull().default("ok"), // ok | error | skipped
+  meta: text("meta"), // JSON string payload for auditing
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
