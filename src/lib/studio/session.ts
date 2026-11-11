@@ -1,13 +1,30 @@
 import { createHash, createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
-import { SESSION_COOKIE, SESSION_DAYS, SESSION_SECRET } from "./config";
+import {
+  SESSION_COOKIE,
+  SESSION_DAYS,
+  SESSION_SECRET,
+  STUDIO_PASSPHRASE,
+} from "./config";
 
 // Stateless signed session: "<expiresAtMs>.<hmac(expiresAtMs)>".
 // No DB needed for auth (Phase 1); the secret never leaves the server.
 // Upgrade path: swap for DB-backed sessions if we ever need revocation.
 
+/**
+ * Session HMAC key derived from BOTH secrets: rotating STUDIO_PASSPHRASE
+ * instantly invalidates every existing session (all re-signed on next
+ * login), which is the kill switch if a session is ever compromised.
+ */
+const STUDIO_PASSPHRASE_NORMALIZED = (STUDIO_PASSPHRASE ?? "")
+  .trim()
+  // NFKC folds lookalike unicode so a paste from a password manager matches.
+  .normalize("NFKC");
+
 function key(): Buffer {
-  return createHash("sha256").update(SESSION_SECRET).digest();
+  return createHash("sha256")
+    .update(`${SESSION_SECRET}:${STUDIO_PASSPHRASE_NORMALIZED}`)
+    .digest();
 }
 
 export function sessionExpiresAt(): number {
@@ -48,7 +65,3 @@ export function passphraseMatches(candidate: string): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-const STUDIO_PASSPHRASE_NORMALIZED = (process.env.STUDIO_PASSPHRASE ?? "")
-  .trim()
-  // NFKC folds lookalike unicode so a paste from a password manager matches.
-  .normalize("NFKC");

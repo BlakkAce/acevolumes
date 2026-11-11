@@ -1,0 +1,43 @@
+name: Weekly database backup
+
+on:
+  schedule:
+    # Sundays 03:00 UTC
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install matching tools (pg_dump 18 + age)
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -sf -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -q
+          sudo apt-get install -y postgresql-client-18 age
+
+      - name: Dump, encrypt, clean
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AGE_RECIPIENT: age1t08klhmx6atx747jgucyth5kr7d8xu4mv5u86dfwrxjkrj3rv39q2dzfkr
+        run: |
+          set -euo pipefail
+          OUT="acevolumes-prod-$(date -u +%Y-%m-%d).dump"
+          pg_dump --no-owner --no-privileges --format=custom --file="$OUT" "$DATABASE_URL"
+          age -r "$AGE_RECIPIENT" -o "$OUT.age" "$OUT"
+          rm "$OUT"
+          sha256sum "$OUT.age"
+
+      - name: Upload encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: acevolumes-prod-*.dump.age
+          retention-days: 90
