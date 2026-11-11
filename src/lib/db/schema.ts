@@ -88,6 +88,7 @@ export const socialAccounts = pgTable("social_accounts", {
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
+  meta: text("meta"), // JSON: platform-specific ids (pageId, igUserId, authorUrn...)
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

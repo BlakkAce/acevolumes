@@ -38,6 +38,7 @@ export function middleware(req: NextRequest) {
     // Public read-only client invoice links (unguessable tokens).
     pathname.startsWith("/api/track") ||
     pathname.startsWith("/api/cron") ||
+    pathname.startsWith("/api/social") ||
     pathname.startsWith("/invoice/") ||
     // Generated metadata routes (opengraph-image, icons): extensionless.
     pathname.startsWith("/opengraph-image") ||
