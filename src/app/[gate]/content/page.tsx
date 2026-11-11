@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { getDb, dbConfigured } from "@/lib/db";
 import { posts, socialAccounts, agentRuns } from "@/lib/db/schema";
-import { bufferProfileFor, bufferCreate, bufferToken } from "@/lib/social/buffer";
+import { bufferProfileFor, bufferCreate, bufferTokenAny } from "@/lib/social/buffer";
 import { ensureMediaUrl } from "@/lib/media/cards";
 import { draftWeek, PLATFORMS } from "@/lib/agents/scribe";
 import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
@@ -86,7 +86,7 @@ async function saveEdit(formData: FormData) {
 
 async function pushToBuffer() {
   "use server";
-  if (!dbConfigured() || !bufferToken()) return;
+  if (!dbConfigured() || !bufferTokenAny()) return;
   const db = getDb();
   const now = new Date();
   const horizon = new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000);
@@ -103,14 +103,15 @@ async function pushToBuffer() {
   let pushed = 0;
   const errors: string[] = [];
   for (const row of due) {
-    const profileId = await bufferProfileFor(row.platform);
-    if (!profileId) {
+    const target = await bufferProfileFor(row.platform);
+    if (!target) {
       errors.push(`${row.platform}: no Buffer channel connected`);
       continue;
     }
     const photoUrl = await ensureMediaUrl(row.mediaRef, row.id);
     const outcome = await bufferCreate({
-      profileId,
+      profileId: target.profileId,
+      accountKey: target.accountKey,
       text: row.content,
       scheduledAt: row.scheduledFor,
       photoUrl,

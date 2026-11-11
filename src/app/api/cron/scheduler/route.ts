@@ -3,7 +3,7 @@ import { and, eq, lte } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { agentRuns, posts } from "@/lib/db/schema";
 import { isConnected, post } from "@/lib/social/platforms";
-import { bufferProfileFor, bufferCreate, bufferToken } from "@/lib/social/buffer";
+import { bufferProfileFor, bufferCreate, bufferTokenAny } from "@/lib/social/buffer";
 import { ensureMediaUrl } from "@/lib/media/cards";
 import { PLATFORMS } from "@/lib/agents/scribe";
 
@@ -37,21 +37,22 @@ export async function GET(req: Request) {
 
   // Delivery preference: Buffer (one token, owns all platform connections);
   // direct platform APIs remain as fallback for the future.
-  const useBuffer = Boolean(bufferToken());
+  const useBuffer = Boolean(bufferTokenAny());
 
   for (const platform of PLATFORMS) {
     const rows = due.filter((p) => p.platform === platform);
     if (rows.length === 0) continue;
     if (useBuffer) {
-      const profileId = await bufferProfileFor(platform);
-      if (!profileId) {
+      const target = await bufferProfileFor(platform);
+      if (!target) {
         waiting.push({ platform, count: rows.length });
         continue;
       }
       for (const row of rows) {
         const photoUrl = await ensureMediaUrl(row.mediaRef, row.id);
         const outcome = await bufferCreate({
-          profileId,
+          profileId: target.profileId,
+          accountKey: target.accountKey,
           text: row.content,
           scheduledAt: row.scheduledFor,
           photoUrl,

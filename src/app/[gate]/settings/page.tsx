@@ -11,7 +11,7 @@ import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
 import { isConfigured } from "@/lib/social/oauth";
 import { metaOf, saveConnection } from "@/lib/social/store";
-import { bufferChannels, bufferToken } from "@/lib/social/buffer";
+import { bufferChannels, bufferAccounts } from "@/lib/social/buffer";
 import { agentRuns } from "@/lib/db/schema";
 
 // Auth-gated studio page: block instead of streaming a shell.
@@ -31,32 +31,34 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-async function syncBuffer() {
+async function syncBuffer(formData: FormData) {
   "use server";
-  if (!dbConfigured() || !bufferToken()) return;
+  const key = String(formData.get("account") ?? "1") === "2" ? "2" : "1";
+  const token = bufferAccounts().find((a) => a.key === key)?.token;
+  if (!dbConfigured() || !token) return;
   const db = getDb();
   let n = 0;
   try {
-    const channels = await bufferChannels();
+    const channels = await bufferChannels(token, key);
     for (const ch of channels) {
       await saveConnection({
         platform: ch.platform,
         handle: ch.handle,
-        accessToken: "via-buffer",
-        meta: { bufferProfileId: ch.id },
+        accessToken: `buffer-${key}`,
+        meta: { bufferProfileId: ch.id, bufferAccountKey: key },
       });
       n += 1;
     }
     await db.insert(agentRuns).values({
       agent: "scribe",
-      summary: `Buffer sync: ${n} channel${n === 1 ? "" : "s"} mapped.`,
+      summary: `Buffer account ${key} sync: ${n} channel${n === 1 ? "" : "s"} mapped.`,
       status: "ok",
-      meta: JSON.stringify({ n }),
+      meta: JSON.stringify({ key, n }),
     });
   } catch (e) {
     await db.insert(agentRuns).values({
       agent: "scribe",
-      summary: `Buffer sync failed: ${e instanceof Error ? e.message.slice(0, 120) : "unknown"}`,
+      summary: `Buffer account ${key} sync failed: ${e instanceof Error ? e.message.slice(0, 120) : "unknown"}`,
       status: "error",
     });
   }
@@ -168,43 +170,55 @@ async function Settings({ p }: { p: Promise<{ gate: string }> }) {
       ) : null}
 
       <h2 className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] opacity-50">
-        Buffer (delivery)
+        Buffer accounts (delivery)
       </h2>
-      <div className="mt-3 rounded-2xl border p-4" style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p className="text-sm font-semibold">Buffer account</p>
-            <p className="mt-1 text-sm opacity-60">
-              Approved posts are delivered to Buffer, which owns the platform
-              connections and does the actual posting.
-            </p>
-          </div>
-          <span
-            className="rounded-full px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider"
-            style={{ color: bufferToken() ? "#1a7a4d" : "var(--fg-muted)" }}
-          >
-            {bufferToken() ? "token detected" : "no token"}
-          </span>
-        </div>
-        <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm opacity-70">
-          <li>Create a free Buffer account as acevolumesofficial@gmail.com and connect your Facebook Page, Instagram and X channels inside Buffer (its own UI, no developer consoles).</li>
-          <li>At publish.buffer.com/settings/api generate an API token.</li>
-          <li>Add it to Vercel as BUFFER_ACCESS_TOKEN and redeploy.</li>
-          <li>Tap Sync channels below: your Buffer channels appear as connected platforms here.</li>
-        </ol>
-        <form action={syncBuffer} className="mt-3">
-          <button
-            type="submit"
-            className="rounded-lg px-3 py-1.5 text-sm font-semibold"
-            style={{
-              background: bufferToken() ? "var(--accent)" : "transparent",
-              color: bufferToken() ? "var(--accent-fg)" : "var(--fg-muted)",
-            }}
-            disabled={!bufferToken()}
-          >
-            Sync channels
-          </button>
-        </form>
+      <p className="mt-3 max-w-2xl text-sm opacity-60">
+        Approved posts are delivered to Buffer, which owns the platform
+        connections and does the actual posting. Two accounts are supported
+        (for example one brand account and one personal or client account).
+      </p>
+      <div className="mt-3 grid gap-3">
+        {[
+          { key: "1" as const, label: "Buffer account 1", env: "BUFFER_ACCESS_TOKEN (or _1)" },
+          { key: "2" as const, label: "Buffer account 2", env: "BUFFER_ACCESS_TOKEN_2" },
+        ].map((acc) => {
+          const has = bufferAccounts().some((a) => a.key === acc.key);
+          return (
+            <div key={acc.key} className="rounded-2xl border p-4" style={{ borderColor: "color-mix(in oklab, var(--fg) 12%, transparent)" }}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold">{acc.label}</p>
+                  <p className="mt-1 text-xs opacity-50 font-mono">env: {acc.env}</p>
+                </div>
+                <span
+                  className="rounded-full px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider"
+                  style={{ color: has ? "#1a7a4d" : "var(--fg-muted)" }}
+                >
+                  {has ? "token detected" : "no token"}
+                </span>
+              </div>
+              <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm opacity-70">
+                <li>In Buffer: connect the channels this account should own (its own UI, no developer consoles).</li>
+                <li>At publish.buffer.com/settings/api generate an API token.</li>
+                <li>Add it to Vercel as {acc.env.split(" (")[0]} and redeploy.</li>
+              </ol>
+              <form action={syncBuffer} className="mt-3">
+                <input type="hidden" name="account" value={acc.key} />
+                <button
+                  type="submit"
+                  className="rounded-lg px-3 py-1.5 text-sm font-semibold"
+                  style={{
+                    background: has ? "var(--accent)" : "transparent",
+                    color: has ? "var(--accent-fg)" : "var(--fg-muted)",
+                  }}
+                  disabled={!has}
+                >
+                  Sync channels
+                </button>
+              </form>
+            </div>
+          );
+        })}
       </div>
 
       <h2 className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] opacity-50">
