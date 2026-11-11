@@ -214,7 +214,7 @@ export type Proof =
 
 export const PROOF: Proof[] = [
   { kind: "static", display: "2016", label: "Working since" },
-  { kind: "count", to: 15, suffix: "+", label: "Websites redesigned" },
+  { kind: "count", to: 100, suffix: "+", label: "Websites built" },
   { kind: "count", to: 30, prefix: "+", suffix: "%", label: "Average lift in site engagement" },
   { kind: "count", to: 20, prefix: "+", suffix: "%", label: "Average lift in organic search traffic" },
 ];
