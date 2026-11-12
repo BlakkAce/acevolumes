@@ -136,13 +136,17 @@ async function Settings({
   if (dbConfigured()) {
     const db = getDb();
     let accounts = await db.select().from(socialAccounts);
-    // AUTO-SYNC: the moment a token exists, detect its channels once.
+    // AUTO-SYNC: every settings load re-detects each account's channels and
+    // maps any that are new (e.g. a channel added inside Buffer since last
+    // time). Known channels are untouched; only genuinely new ones log.
     for (const acc of bufferAccounts()) {
-      const already = accounts.some((a) => metaOf(a).bufferAccountKey === acc.key);
-      if (already) continue;
       try {
         const channels = await bufferChannels(acc.token, acc.key);
-        for (const ch of channels) {
+        const known = accounts
+          .filter((a) => metaOf(a).bufferAccountKey === acc.key)
+          .map((a) => a.platform);
+        const fresh = channels.filter((ch) => !known.includes(ch.platform));
+        for (const ch of fresh) {
           await saveConnection({
             platform: ch.platform,
             handle: ch.handle,
@@ -150,13 +154,13 @@ async function Settings({
             meta: { bufferProfileId: ch.id, bufferAccountKey: acc.key },
           });
         }
-        if (channels.length > 0) {
-          autoSynced.push(`account ${acc.key}: ${channels.map((c) => c.platform).join(", ")}`);
+        if (fresh.length > 0) {
+          autoSynced.push(`account ${acc.key}: ${fresh.map((c) => c.platform).join(", ")}`);
           await db.insert(agentRuns).values({
             agent: "scribe",
-            summary: `Auto-sync (account ${acc.key}): ${channels.length} channel${channels.length === 1 ? "" : "s"} detected.`,
+            summary: `Auto-sync (account ${acc.key}): ${fresh.length} new channel${fresh.length === 1 ? "" : "s"} — ${fresh.map((c) => c.platform).join(", ")}.`,
             status: "ok",
-            meta: JSON.stringify({ key: acc.key, n: channels.length }),
+            meta: JSON.stringify({ key: acc.key, added: fresh.length }),
           });
         }
       } catch {

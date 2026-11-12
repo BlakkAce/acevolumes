@@ -113,8 +113,9 @@ export async function bufferChannels(
       `query { channels(input: { organizationId: "${org.id}" }) { id name displayName service } }`,
     );
     for (const c of data.channels ?? []) {
-      const platform = SERVICE_MAP[c.service];
-      if (!platform) continue;
+      // Unknown services are kept under their raw Buffer name (never silently
+      // dropped): whatever the user connects shows up in the studio.
+      const platform = SERVICE_MAP[c.service] ?? c.service;
       channels.push({
         id: c.id,
         platform,
