@@ -10,7 +10,6 @@ import { LoginView } from "../login-view";
 import { GateStream } from "../gate-stream";
 
 // Auth-gated studio page: block instead of streaming a shell.
-export const instant = false;
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -100,6 +99,8 @@ export default async function OfferPage({
   params: Promise<{ gate: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <GateStream title="Offer">
       <Offer p={params} sp={searchParams} />

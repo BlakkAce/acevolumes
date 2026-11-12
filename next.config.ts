@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  cacheComponents: true,
-  // Studio pages are session-personal: the CDN must never cache them. PPR
-  // makes the prerendered shell cacheable; this header closes that door.
+  // cacheComponents/PPR deliberately OFF: it prerendered session-checked
+  // studio pages into the CDN cache (serving one user's render to others).
+  // Studio routes are fully dynamic per request instead.
   async headers() {
     return [
       {
@@ -16,7 +16,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  partialPrefetching: true,
   images: {
     // Client logo marks are local, trusted SVG/PNG assets rendered monochrome.
     dangerouslyAllowSVG: true,

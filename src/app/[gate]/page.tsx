@@ -46,13 +46,15 @@ async function GateContent({
   return <LoginView error={errorLabel(e)} />;
 }
 
-export default function GatePage({
+export default async function GatePage({
   params,
   searchParams,
 }: {
   params: Promise<{ gate: string }>;
   searchParams: Promise<{ e?: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense fallback={<LoginSkeleton />}>
       <GateContent params={params} searchParams={searchParams} />

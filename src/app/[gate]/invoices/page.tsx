@@ -14,11 +14,13 @@ import {
 import { verifySessionToken } from "@/lib/studio/session";
 import { LoginView } from "../login-view";
 
-export default function InvoicesPage({
+export default async function InvoicesPage({
   params,
 }: {
   params: Promise<{ gate: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense fallback={<Skeleton />}>
       <InvoicesContent p={params} />

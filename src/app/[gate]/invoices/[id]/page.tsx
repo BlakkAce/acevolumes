@@ -23,11 +23,13 @@ const input =
 const border = { borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" };
 const label = "mb-1 block font-mono text-[11px] uppercase tracking-wider opacity-60";
 
-export default function InvoiceDetailPage({
+export default async function InvoiceDetailPage({
   params,
 }: {
   params: Promise<{ gate: string; id: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense
       fallback={

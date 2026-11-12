@@ -14,13 +14,15 @@ import {
 import { hasSession, verifySessionToken } from "@/lib/studio/session";
 import { LoginView } from "../login-view";
 
-export default function ClientsPage({
+export default async function ClientsPage({
   params,
   searchParams,
 }: {
   params: Promise<{ gate: string }>;
   searchParams: Promise<{ q?: string; status?: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense fallback={<ListSkeleton />}>
       <ClientsContent p={params} sp={searchParams} />

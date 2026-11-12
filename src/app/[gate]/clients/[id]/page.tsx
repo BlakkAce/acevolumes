@@ -21,11 +21,13 @@ const INPUT =
   "h-10 w-full rounded-lg border bg-transparent px-3 text-sm outline-none";
 const BORDER = { borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)" };
 
-export default function ClientDetailPage({
+export default async function ClientDetailPage({
   params,
 }: {
   params: Promise<{ gate: string; id: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   // Doubly-dynamic route: params must be read inside the Suspense boundary.
   return (
     <Suspense fallback={<div className="mx-auto max-w-3xl px-4 py-10 opacity-30"><div className="h-64 rounded-2xl bg-current" /></div>}>

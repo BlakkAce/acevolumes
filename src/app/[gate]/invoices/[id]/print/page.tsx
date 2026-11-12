@@ -14,11 +14,13 @@ import {
 import { verifySessionToken } from "@/lib/studio/session";
 import { InvoiceSheet } from "@/components/invoice-sheet";
 
-export default function InvoicePrintPage({
+export default async function InvoicePrintPage({
   params,
 }: {
   params: Promise<{ gate: string; id: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense fallback={<div className="p-10 opacity-40">Loading…</div>}>
       <Print p={params} />

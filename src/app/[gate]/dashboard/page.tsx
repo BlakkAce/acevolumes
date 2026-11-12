@@ -143,11 +143,13 @@ function DbSetupPanel() {
   );
 }
 
-export default function DashboardPage({
+export default async function DashboardPage({
   params,
 }: {
   params: Promise<{ gate: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   // No awaits in the shell — dynamic reads happen inside Suspense only.
   return (
     <Suspense fallback={<OverviewSkeleton />}>

@@ -12,11 +12,13 @@ import { placesConfigured } from "@/lib/studio/places";
 import { LoginView } from "../login-view";
 import { ScoutClient } from "./scout-client";
 
-export default function ScoutPage({
+export default async function ScoutPage({
   params,
 }: {
   params: Promise<{ gate: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense
       fallback={

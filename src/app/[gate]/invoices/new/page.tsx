@@ -16,11 +16,13 @@ import { ItemsEditor } from "../items-editor";
 import { CURRENCY_CHOICES } from "@/lib/currency";
 import { createInvoice } from "../actions";
 
-export default function NewInvoicePage({
+export default async function NewInvoicePage({
   params,
 }: {
   params: Promise<{ gate: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense
       fallback={

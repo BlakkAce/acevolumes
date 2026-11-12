@@ -12,11 +12,13 @@ import { LoginView } from "../../login-view";
 import { ClientFields } from "../../client-fields";
 import { createClient } from "../actions";
 
-export default function NewClientPage({
+export default async function NewClientPage({
   params,
 }: {
   params: Promise<{ gate: string }>;
 }) {
+  // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
+  await connection();
   return (
     <Suspense fallback={<div className="mx-auto max-w-2xl px-4 py-10 opacity-30"><div className="h-72 rounded-2xl bg-current" /></div>}>
       <NewClient p={params} />
