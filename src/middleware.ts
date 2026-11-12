@@ -28,6 +28,11 @@ export function middleware(req: NextRequest) {
     // dashboard page itself renders the login form when unauthenticated.
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
+    // Session-personal pages must NEVER be CDN-cached: a cached render would
+    // serve one user's (or a logged-out) state to everyone. Vercel HITs on
+    // `public` responses regardless of cookies — so make it explicit.
+    res.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
+    res.headers.set("Vary", "Cookie");
     return res;
   }
 
