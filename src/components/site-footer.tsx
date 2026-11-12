@@ -13,6 +13,7 @@ const SERVICES = [
 const STUDIO = [
   { href: "/work", label: "Work" },
   { href: "/about", label: "About the studio" },
+  { href: "/blog", label: "Blog — guides & answers" },
   { href: "/about#process", label: "How we work" },
   { href: "/founder", label: "Meet the founder" },
   { href: "/contact", label: "Contact" },

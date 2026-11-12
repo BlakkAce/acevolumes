@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/services", label: "Services" },
   { href: "/mortgage", label: "Mortgage" },
   { href: "/about", label: "Studio" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 
