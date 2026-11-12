@@ -89,6 +89,8 @@ const SERVICE_MAP: Record<string, string> = {
   instagram: "instagram",
   twitter: "x",
   linkedin: "linkedin",
+  pinterest: "pinterest",
+  threads: "threads",
 };
 
 /** Fetch every channel across all organizations of the account. */

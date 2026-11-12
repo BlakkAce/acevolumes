@@ -36,6 +36,8 @@ const PLATFORM_LABEL: Record<string, string> = {
   instagram: "Instagram",
   x: "X",
   linkedin: "LinkedIn",
+  pinterest: "Pinterest",
+  threads: "Threads",
 };
 
 const STATUS_TINT: Record<string, string> = {

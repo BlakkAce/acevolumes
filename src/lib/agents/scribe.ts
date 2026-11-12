@@ -13,7 +13,7 @@ import { agentRuns, posts, socialAccounts } from "@/lib/db/schema";
  * feeds the model; queue + approval flow stay identical.
  */
 
-export const PLATFORMS = ["facebook", "instagram", "x", "linkedin"] as const;
+export const PLATFORMS = ["facebook", "instagram", "x", "linkedin", "pinterest", "threads"] as const;
 export type Platform = (typeof PLATFORMS)[number];
 
 const SITE = "https://acevolumes.vercel.app";
@@ -25,6 +25,8 @@ const HOUR_UTC: Record<Platform, number> = {
   instagram: 17,
   x: 15,
   linkedin: 14,
+  pinterest: 18,
+  threads: 16,
 };
 
 /** LinkedIn is a weekdays channel; the others post daily. */
@@ -33,6 +35,8 @@ const WEEKDAYS_ONLY: Record<Platform, boolean> = {
   instagram: false,
   x: false,
   linkedin: true,
+  pinterest: false,
+  threads: false,
 };
 
 const BASE_TAGS = ["#AceVolumes", "#WebDesign", "#DigitalStudio"];
@@ -236,6 +240,12 @@ function withHook(body: string, hook: string): string {
 }
 
 function render(p: Platform, t: Theme, hookIndex = -1): string {
+  if (p === "pinterest")
+    // Pinterest is search-first: descriptive, keyword-rich, evergreen.
+    return `${hookIndex >= 0 ? withHook(t.long, altHooks(t)[hookIndex]) : t.long}\n\nSave this. ${t.hashtags.slice(0, 2).join(" ")}`;
+  if (p === "threads")
+    // Threads is casual and tag-light: just the words.
+    return hookIndex >= 0 ? withHook(t.short, altHooks(t)[hookIndex]) : t.short;
   if (p === "linkedin")
     return `${hookIndex >= 0 ? withHook(t.long, altHooks(t)[hookIndex]) : t.long}\n\n${t.hashtags.join(" ")}`;
   if (p === "facebook") {

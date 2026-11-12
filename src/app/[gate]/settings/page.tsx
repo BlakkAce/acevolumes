@@ -88,6 +88,8 @@ const PLATFORM_LABEL: Record<string, string> = {
   instagram: "Instagram",
   x: "X (@acevolumes)",
   linkedin: "LinkedIn (David)",
+  pinterest: "Pinterest",
+  threads: "Threads",
 };
 
 export default async function SettingsPage({
