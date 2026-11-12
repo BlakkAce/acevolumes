@@ -12,6 +12,7 @@ import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
 import { metaOf, saveConnection } from "@/lib/social/store";
 import { bufferChannels, bufferAccounts, BufferError } from "@/lib/social/buffer";
+import { GateStream } from "../gate-stream";
 
 // Auth-gated studio page: block instead of streaming a shell.
 export const instant = false;
@@ -97,7 +98,11 @@ export default async function SettingsPage({
   params: Promise<{ gate: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <Settings p={params} sp={searchParams} />;
+  return (
+    <GateStream title="Settings">
+      <Settings p={params} sp={searchParams} />
+    </GateStream>
+  );
 }
 
 async function Settings({

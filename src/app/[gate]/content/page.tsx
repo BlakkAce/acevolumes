@@ -13,6 +13,7 @@ import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { verifySessionToken } from "@/lib/studio/session";
 import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
+import { GateStream } from "../gate-stream";
 
 // Auth-gated studio page: block instead of streaming a shell.
 export const instant = false;
@@ -174,7 +175,11 @@ export default async function ContentPage({
 }: {
   params: Promise<{ gate: string }>;
 }) {
-  return <Content p={params} />;
+  return (
+    <GateStream title="Content">
+      <Content p={params} />
+    </GateStream>
+  );
 }
 
 async function Content({ p }: { p: Promise<{ gate: string }> }) {

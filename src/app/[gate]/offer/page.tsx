@@ -7,6 +7,7 @@ import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { verifySessionToken } from "@/lib/studio/session";
 import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
+import { GateStream } from "../gate-stream";
 
 // Auth-gated studio page: block instead of streaming a shell.
 export const instant = false;
@@ -99,7 +100,11 @@ export default async function OfferPage({
   params: Promise<{ gate: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <Offer p={params} sp={searchParams} />;
+  return (
+    <GateStream title="Offer">
+      <Offer p={params} sp={searchParams} />
+    </GateStream>
+  );
 }
 
 async function Offer({
