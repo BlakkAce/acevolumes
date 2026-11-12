@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { getDb, dbConfigured } from "@/lib/db";
 import { mediaAssets } from "@/lib/db/schema";
 
@@ -63,12 +64,63 @@ function card(variant: number): string {
 </svg>`;
 }
 
-/** Returns a public image URL for the post: existing asset or generated card. */
+/**
+ * Optional AI illustration via Google "nano banana" (Gemini image
+ * generation). Activates only when GEMINI_API_KEY exists; brand cards
+ * remain the always-available fallback. Prompts are brand-styled and
+ * abstract: no text rendering (the model mangles words), no people.
+ */
+async function generateIllustration(postId: number, variant: number): Promise<string | null> {
+  const key = process.env.GEMINI_API_KEY?.trim();
+  if (!key) return null;
+  const id = `ai-${postId}`;
+  const db = getDb();
+  const existing = await db
+    .select({ id: mediaAssets.id })
+    .from(mediaAssets)
+    .where(eq(mediaAssets.id, id))
+    .limit(1);
+  if (existing.length > 0) return `${SITE}/api/media/${id}`;
+  try {
+    const prompts = [
+      "Abstract minimalist editorial illustration, deep plum purple background (#3b153a), cream and warm gold geometric shapes suggesting growth and rising bar charts, soft constellation dots, premium fintech aesthetic, flat vector style, no text, no letters, no people, square 1:1",
+      "Abstract minimalist editorial illustration, deep plum purple background, elegant gold arc curving like a runway across cream geometric buildings, subtle starfield dots, premium architecture-meets-finance aesthetic, flat vector style, no text, no letters, no people, square 1:1",
+    ];
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image"}:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompts[variant % prompts.length] }] }],
+        }),
+      },
+    );
+    if (!res.ok) return null;
+    const out = (await res.json()) as {
+      candidates?: { content?: { parts?: { inlineData?: { mimeType?: string; data?: string } }[] } }[];
+    };
+    const part = out.candidates?.[0]?.content?.parts?.find((x) => x.inlineData?.data);
+    if (!part?.inlineData?.data) return null;
+    const mime = part.inlineData.mimeType ?? "image/png";
+    await db
+      .insert(mediaAssets)
+      .values({ id, mime, data: part.inlineData.data })
+      .onConflictDoNothing();
+    return `${SITE}/api/media/${id}`;
+  } catch {
+    return null; // any failure -> brand card fallback
+  }
+}
+
+/** Returns a public image URL for the post: existing asset, AI illustration (when configured), or brand card. */
 export async function ensureMediaUrl(mediaRef: string | null, postId: number): Promise<string | null> {
   if (mediaRef) {
     return mediaRef.startsWith("http") ? mediaRef : `${SITE}${mediaRef}`;
   }
   if (!dbConfigured()) return null;
+  const ai = await generateIllustration(postId, postId);
+  if (ai) return ai;
   const db = getDb();
   const id = `card-${postId}-${postId % 2}`;
   const existing = await db

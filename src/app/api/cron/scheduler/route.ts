@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { and, eq, lte } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { agentRuns, posts } from "@/lib/db/schema";
-import { isConnected, post } from "@/lib/social/platforms";
 import { bufferProfileFor, bufferCreate, bufferTokenAny } from "@/lib/social/buffer";
 import { ensureMediaUrl } from "@/lib/media/cards";
 import { PLATFORMS } from "@/lib/agents/scribe";
@@ -30,13 +29,11 @@ export async function GET(req: Request) {
     .from(posts)
     .where(and(eq(posts.status, "approved"), lte(posts.scheduledFor, now)));
 
-  const posted: number[] = [];
   const buffered: number[] = [];
   const waiting: { platform: string; count: number }[] = [];
   const failed: { id: number; detail: string }[] = [];
 
-  // Delivery preference: Buffer (one token, owns all platform connections);
-  // direct platform APIs remain as fallback for the future.
+  // Buffer is the only delivery layer (single token, owns all connections).
   const useBuffer = Boolean(bufferTokenAny());
 
   for (const platform of PLATFORMS) {
@@ -73,37 +70,18 @@ export async function GET(req: Request) {
       }
       continue;
     }
-    if (!(await isConnected(platform))) {
-      waiting.push({ platform, count: rows.length });
-      continue;
-    }
-    for (const row of rows) {
-      const outcome = await post(platform, row.content, row.mediaRef);
-      if (outcome.ok) {
-        await db
-          .update(posts)
-          .set({ status: "posted", postedUrl: outcome.url })
-          .where(eq(posts.id, row.id));
-        posted.push(row.id);
-      } else {
-        await db
-          .update(posts)
-          .set({ status: "failed", error: `${outcome.reason}${outcome.detail ? `: ${outcome.detail}` : ""}` })
-          .where(eq(posts.id, row.id));
-        failed.push({ id: row.id, detail: outcome.reason });
-      }
-    }
+    waiting.push({ platform, count: rows.length });
   }
 
-  const summary = `Scheduler sweep: ${buffered.length} buffered, ${posted.length} posted direct, ${waiting
+  const summary = `Scheduler sweep: ${buffered.length} buffered, ${waiting
     .map((w) => `${w.count} waiting on ${w.platform}`)
     .join(", ") || "none waiting"}, ${failed.length} failed.`;
   await db.insert(agentRuns).values({
     agent: "scribe",
     summary,
     status: failed.length > 0 ? "error" : "ok",
-    meta: JSON.stringify({ posted, waiting, failed }),
+    meta: JSON.stringify({ buffered, waiting, failed }),
   });
 
-  return NextResponse.json({ ok: true, buffered, posted, waiting, failed });
+  return NextResponse.json({ ok: true, buffered, waiting, failed });
 }

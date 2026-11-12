@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // The dashboard still cryptographically verifies the session server-side —
 // this fence is for correct statuses and not leaking that the studio exists.
 
-const PUBLIC_ROUTES = ["/", "/about", "/contact", "/founder", "/mortgage", "/services", "/work"];
+const PUBLIC_ROUTES = ["/", "/about", "/blog", "/contact", "/founder", "/mortgage", "/services", "/work"];
 const PATH_RE = /^[a-z0-9]+(-[a-z0-9]+)+$/;
 
 export function middleware(req: NextRequest) {
