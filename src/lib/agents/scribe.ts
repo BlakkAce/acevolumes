@@ -1,6 +1,6 @@
-import { and, gte, lt } from "drizzle-orm";
-import { getDb } from "@/lib/db";
-import { agentRuns, posts } from "@/lib/db/schema";
+import { and, eq, gte, isNotNull, lt } from "drizzle-orm";
+import { getDb, dbConfigured } from "@/lib/db";
+import { agentRuns, posts, socialAccounts } from "@/lib/db/schema";
 
 /**
  * Scribe: drafts one week of social posts per platform into the posts table
@@ -261,16 +261,33 @@ function dayStart(base: Date, offsetDays: number): Date {
 
 export type ScribeResult = { drafted: number; skipped: number };
 
-/** Draft the next 7 days (starting tomorrow) for every platform. */
+/**
+ * Platforms to draft for: the Buffer channels actually connected; all four
+ * while nothing is connected yet so the queue still demonstrates the engine.
+ */
+async function targetPlatforms(): Promise<Platform[]> {
+  if (!dbConfigured()) return [...PLATFORMS];
+  const rows = await getDb()
+    .select({ platform: socialAccounts.platform })
+    .from(socialAccounts)
+    .where(and(eq(socialAccounts.status, "connected"), isNotNull(socialAccounts.accessToken)));
+  const connected = rows
+    .map((r) => r.platform)
+    .filter((p): p is Platform => (PLATFORMS as readonly string[]).includes(p));
+  return connected.length > 0 ? connected : [...PLATFORMS];
+}
+
+/** Draft the next 7 days (starting tomorrow) for the connected platforms. */
 export async function draftWeek(now = new Date()): Promise<ScribeResult> {
   const db = getDb();
   let drafted = 0;
   let skipped = 0;
+  const platforms = await targetPlatforms();
 
   for (let day = 1; day <= 7; day += 1) {
     const start = dayStart(now, day);
     const t = themeFor(start.getUTCDay() * 7 + start.getUTCDate());
-    for (const p of PLATFORMS) {
+    for (const p of platforms) {
       if (WEEKDAYS_ONLY[p]) {
         const dow = start.getUTCDay();
         if (dow === 0 || dow === 6) {
@@ -315,9 +332,9 @@ export async function draftWeek(now = new Date()): Promise<ScribeResult> {
 
   await db.insert(agentRuns).values({
     agent: "scribe",
-    summary: `Drafted ${drafted} post${drafted === 1 ? "" : "s"} for the next 7 days (${skipped} slots already filled or skipped).`,
+    summary: `Drafted ${drafted} post${drafted === 1 ? "" : "s"} for the next 7 days (${skipped} slots already filled or skipped) for: ${platforms.join(", ")}.`,
     status: "ok",
-    meta: JSON.stringify({ drafted, skipped }),
+    meta: JSON.stringify({ drafted, skipped, platforms }),
   });
 
   return { drafted, skipped };

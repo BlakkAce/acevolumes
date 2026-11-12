@@ -1,18 +1,23 @@
+import { eq } from "drizzle-orm";
 import { getDb, dbConfigured } from "@/lib/db";
 import { socialAccounts } from "@/lib/db/schema";
 import { metaOf } from "@/lib/social/store";
-import { eq } from "drizzle-orm";
 
 /**
- * Buffer integration: our app stays the brain (drafts, approval, media);
- * Buffer is the delivery layer that owns the platform connections. One
- * access token from publish.buffer.com/settings/api drives everything.
+ * Buffer integration via the current GraphQL API (api.buffer.com, Bearer
+ * key). Our app stays the brain (drafts, approval, media); Buffer owns the
+ * platform connections and does the posting.
  *
- * Uses Buffer's REST v1 endpoints (profiles.json, updates/create.json) —
- * the shape is stable and supports scheduled_at + photo URLs.
+ * API surface (developers.buffer.com):
+ *   query  account { organizations { id name } }
+ *   query  channels(input: { organizationId }) { id name displayName service }
+ *   mutation createPost(input: { text, channelId, schedulingType: automatic,
+ *             mode: customScheduled, dueAt, assets: [{ image: { url } }] })
+ * A failed mutation returns HTTP 200 with a MutationError union — always
+ * read the union, never the status code.
  */
 
-const BASE = "https://api.bufferapp.com/1";
+const ENDPOINT = "https://api.buffer.com";
 
 export type BufferAccountKey = "1" | "2";
 
@@ -26,18 +31,56 @@ export function bufferAccounts(): { key: BufferAccountKey; token: string }[] {
   return out;
 }
 
-export function bufferToken(key: BufferAccountKey = "1"): string | null {
-  return bufferAccounts().find((a) => a.key === key)?.token ?? null;
-}
-
 export function bufferTokenAny(): string | null {
   return bufferAccounts()[0]?.token ?? null;
 }
+
+export class BufferError extends Error {
+  constructor(
+    public kind: "unauthorized" | "rate_limited" | "network" | "graphql" | "empty",
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+async function gql<T>(token: string, query: string): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ query }),
+    });
+  } catch {
+    throw new BufferError("network", "Could not reach Buffer (network error).");
+  }
+  if (res.status === 401 || res.status === 403) {
+    throw new BufferError(
+      "unauthorized",
+      "Buffer rejected the API key (401). Generate a fresh key at publish.buffer.com/settings/api (a Personal API Key) and update the env var in Vercel.",
+    );
+  }
+  if (res.status === 429) {
+    const wait = res.headers.get("Retry-After") ?? "60";
+    throw new BufferError("rate_limited", `Buffer rate limit hit — retry in ${wait}s.`);
+  }
+  if (!res.ok) throw new BufferError("network", `Buffer returned HTTP ${res.status}.`);
+  const out = (await res.json()) as { data?: T; errors?: { message: string }[] };
+  if (out.errors?.length) {
+    throw new BufferError("graphql", out.errors.map((e) => e.message).join("; ").slice(0, 180));
+  }
+  if (!out.data) throw new BufferError("graphql", "Buffer returned an empty response.");
+  return out.data;
+}
+
+type GqlChannel = { id: string; name: string; displayName: string | null; service: string };
 
 export type BufferChannel = {
   id: string;
   platform: string; // facebook | instagram | x | linkedin
   handle: string;
+  accountKey: BufferAccountKey;
 };
 
 /** Buffer service names -> our platform names. X is "twitter" in Buffer. */
@@ -48,31 +91,40 @@ const SERVICE_MAP: Record<string, string> = {
   linkedin: "linkedin",
 };
 
+/** Fetch every channel across all organizations of the account. */
 export async function bufferChannels(
   token: string,
   accountKey: BufferAccountKey = "1",
-): Promise<(BufferChannel & { accountKey: BufferAccountKey })[]> {
-  if (!token) return [];
-  const res = await fetch(`${BASE}/profiles.json?access_token=${encodeURIComponent(token)}`);
-  if (!res.ok) throw new Error(`Buffer profiles: HTTP ${res.status}`);
-  const rows = (await res.json()) as {
-    id: string;
-    service: string;
-    service_username?: string;
-    display_name?: string;
-    formatted_username?: string;
-  }[];
-  return rows
-    .map((r) => ({
-      id: r.id,
-      platform: SERVICE_MAP[r.service] ?? r.service,
-      handle: r.formatted_username || r.service_username || r.display_name || r.id,
-      accountKey,
-    }))
-    .filter((c) => c.platform in SERVICE_MAP);
+): Promise<BufferChannel[]> {
+  const orgs = await gql<{ account: { organizations: { id: string; name: string }[] } }>(
+    token,
+    `query Orgs { account { organizations { id name } } }`,
+  );
+  const organizationList = orgs.account?.organizations ?? [];
+  if (organizationList.length === 0) {
+    throw new BufferError("empty", "No Buffer organization found for this key.");
+  }
+  const channels: BufferChannel[] = [];
+  for (const org of organizationList) {
+    const data = await gql<{ channels: GqlChannel[] }>(
+      token,
+      `query { channels(input: { organizationId: "${org.id}" }) { id name displayName service } }`,
+    );
+    for (const c of data.channels ?? []) {
+      const platform = SERVICE_MAP[c.service];
+      if (!platform) continue;
+      channels.push({
+        id: c.id,
+        platform,
+        handle: c.displayName || c.name || c.id,
+        accountKey,
+      });
+    }
+  }
+  return channels;
 }
 
-/** Map from social_accounts: platform -> Buffer profile id + owning account. */
+/** Map from social_accounts: platform -> Buffer channel id + owning account. */
 export async function bufferProfileFor(
   platform: string,
 ): Promise<{ profileId: string; accountKey: BufferAccountKey } | null> {
@@ -90,10 +142,6 @@ export async function bufferProfileFor(
   return { profileId, accountKey };
 }
 
-export function tokenForAccount(key: BufferAccountKey): string | null {
-  return bufferToken(key);
-}
-
 export type BufferCreateResult =
   | { ok: true; updateId: string; bufferedAt: string }
   | { ok: false; error: string };
@@ -105,24 +153,37 @@ export async function bufferCreate(opts: {
   photoUrl?: string | null;
   accountKey?: BufferAccountKey;
 }): Promise<BufferCreateResult> {
-  const token = bufferToken(opts.accountKey ?? "1") ?? bufferAccounts()[0]?.token;
+  const token = bufferAccounts().find((a) => a.key === (opts.accountKey ?? "1"))?.token
+    ?? bufferAccounts()[0]?.token;
   if (!token) return { ok: false, error: "Buffer token not configured" };
-  const form = new URLSearchParams({
-    access_token: token,
-    text: opts.text.slice(0, 5000),
-    "profile_ids[]": opts.profileId,
-    scheduled_at: opts.scheduledAt.toISOString(),
-  });
-  if (opts.photoUrl) form.set("media[photo]", opts.photoUrl);
-  const res = await fetch(`${BASE}/updates/create.json`, { method: "POST", body: form });
-  const out = (await res.json().catch(() => ({}))) as {
-    success?: boolean;
-    updates?: { id: string; scheduled_at?: string }[];
-    message?: string;
-    error?: string;
-  };
-  if (!res.ok || !out.success || !out.updates?.[0]) {
-    return { ok: false, error: out.message || out.error || `HTTP ${res.status}` };
+  const assets = opts.photoUrl
+    ? `, assets: [{ image: { url: "${opts.photoUrl}" } }]`
+    : "";
+  const text = opts.text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  try {
+    const data = await gql<{
+      createPost: { post?: { id: string; dueAt?: string }; message?: string };
+    }>(
+      token,
+      `mutation {
+  createPost(input: {
+    text: "${text}",
+    channelId: "${opts.profileId}",
+    schedulingType: automatic,
+    mode: customScheduled,
+    dueAt: "${opts.scheduledAt.toISOString()}"${assets}
+  }) {
+    ... on PostActionSuccess { post { id dueAt } }
+    ... on MutationError { message }
   }
-  return { ok: true, updateId: out.updates[0].id, bufferedAt: out.updates[0].scheduled_at ?? "" };
+}`,
+    );
+    const r = data.createPost;
+    if (r?.message || !r?.post) {
+      return { ok: false, error: (r?.message ?? "Buffer rejected the post").slice(0, 180) };
+    }
+    return { ok: true, updateId: r.post.id, bufferedAt: r.post.dueAt ?? "" };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message.slice(0, 180) : "unknown error" };
+  }
 }

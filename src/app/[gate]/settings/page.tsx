@@ -5,12 +5,13 @@ import { eq } from "drizzle-orm";
 import { connection } from "next/server";
 import { getDb, dbConfigured } from "@/lib/db";
 import { socialAccounts, agentRuns } from "@/lib/db/schema";
+import { desc } from "drizzle-orm";
 import { STUDIO_PATH, studioConfigured } from "@/lib/studio/config";
 import { verifySessionToken } from "@/lib/studio/session";
 import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
 import { metaOf, saveConnection } from "@/lib/social/store";
-import { bufferChannels, bufferAccounts } from "@/lib/social/buffer";
+import { bufferChannels, bufferAccounts, BufferError } from "@/lib/social/buffer";
 
 // Auth-gated studio page: block instead of streaming a shell.
 export const instant = false;
@@ -35,7 +36,6 @@ async function syncBuffer(formData: FormData) {
   const token = bufferAccounts().find((a) => a.key === key)?.token;
   if (!dbConfigured() || !token) return;
   const db = getDb();
-  let n = 0;
   try {
     const channels = await bufferChannels(token, key);
     for (const ch of channels) {
@@ -45,19 +45,29 @@ async function syncBuffer(formData: FormData) {
         accessToken: `buffer-${key}`,
         meta: { bufferProfileId: ch.id, bufferAccountKey: key },
       });
-      n += 1;
     }
-    await db.insert(agentRuns).values({
-      agent: "scribe",
-      summary: `Buffer account ${key} sync: ${n} channel${n === 1 ? "" : "s"} detected.`,
-      status: "ok",
-      meta: JSON.stringify({ key, n }),
-    });
+    if (channels.length === 0) {
+      await db.insert(agentRuns).values({
+        agent: "scribe",
+        summary: `Buffer account ${key} sync result: key valid, but no channels are connected inside Buffer yet.`,
+        status: "skipped",
+        meta: JSON.stringify({ key, n: 0 }),
+      });
+    } else {
+      await db.insert(agentRuns).values({
+        agent: "scribe",
+        summary: `Buffer account ${key} sync: ${channels.length} channel${channels.length === 1 ? "" : "s"} — ${channels.map((c) => c.platform).join(", ")}.`,
+        status: "ok",
+        meta: JSON.stringify({ key, n: channels.length }),
+      });
+    }
   } catch (e) {
+    const msg = e instanceof BufferError ? `${e.kind}: ${e.message}` : e instanceof Error ? e.message : "unknown error";
     await db.insert(agentRuns).values({
       agent: "scribe",
-      summary: `Buffer account ${key} sync failed: ${e instanceof Error ? e.message.slice(0, 120) : "unknown"}`,
+      summary: `Buffer account ${key} sync failed: ${msg.slice(0, 160)}`,
       status: "error",
+      meta: JSON.stringify({ key }),
     });
   }
   revalidatePath(`/${STUDIO_PATH}/settings`);
@@ -151,6 +161,17 @@ async function Settings({
 
   const byPlatform = new Map(accountRows.map((a) => [a.platform, a]));
   const tokens = bufferAccounts();
+  const syncRuns = dbConfigured()
+    ? (
+        await getDb()
+          .select()
+          .from(agentRuns)
+          .orderBy(desc(agentRuns.id))
+          .limit(40)
+      ).filter((r) => r.summary.startsWith("Buffer account") && r.summary.includes("sync"))
+    : [];
+  const lastSync = (key: string) =>
+    syncRuns.find((r) => r.summary.startsWith(`Buffer account ${key} `));
 
   return (
     <Shell>
@@ -203,10 +224,22 @@ async function Settings({
                   {has ? (synced ? "connected" : "token set — sync pending") : "no token"}
                 </span>
               </div>
+              {lastSync(acc.key) ? (
+                <p
+                  className="mt-3 rounded-xl border p-3 text-xs"
+                  style={{
+                    borderColor: "color-mix(in oklab, var(--fg) 18%, transparent)",
+                    color: lastSync(acc.key)!.status === "error" ? "#a33" : undefined,
+                  }}
+                >
+                  Last sync: {lastSync(acc.key)!.summary.replace(`Buffer account ${acc.key} `, "").replace(" sync result: ", ": ")}{" "}
+                  <span className="opacity-50">({lastSync(acc.key)!.createdAt.toUTCString().slice(5, 22)} UTC)</span>
+                </p>
+              ) : null}
               {has ? null : (
                 <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm opacity-70">
                   <li>Create/choose the Buffer account (free plan works) and connect its channels inside Buffer.</li>
-                  <li>Generate an API token at publish.buffer.com/settings/api.</li>
+                  <li>Generate a Personal API Key at publish.buffer.com/settings/api.</li>
                   <li>Add to Vercel as <span className="font-mono">{acc.env}</span> and redeploy.</li>
                 </ol>
               )}
