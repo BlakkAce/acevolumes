@@ -27,9 +27,9 @@
 | mortgage website compliance NMLS requirements | FAQ inside post 1 | covered |
 | website speed leads | FAQ inside post 2 | covered |
 | custom website vs template price | FAQ inside post 3 | covered |
+| how to get your business found on google without ads | /blog/how-to-get-your-business-found-on-google-without-ads | live |
 
 ## Next queries to write (queue)
-- "How to get your business found on Google without ads" (local SEO basics)
 - "What is AEO / how do I get my business cited by AI assistants"
 - "Website checklist for loan officers (personal brand under a brokerage)"
 - "Landing page vs website: which does a small business need first?"

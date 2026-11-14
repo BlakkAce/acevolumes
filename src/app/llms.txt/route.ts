@@ -23,7 +23,7 @@ export function GET() {
   lines.push(`- [Services](${SITE}/services): Nine disciplines in one studio: web design, e-commerce, branding, digital marketing, custom development, AI solutions, business systems, content and consulting.`);
   lines.push(`- [Work](${SITE}/work): Selected case studies for clients in the US and worldwide.`);
   lines.push(`- [Mortgage & lending systems](${SITE}/mortgage): Loan-pipeline software, mortgage CRM, digital applications and lender websites.`);
-  lines.push(`- [Blog](${SITE}/blog): Answer-first guides — what pages a mortgage website needs, why sites lose customers in two seconds, what small business websites should cost. Direct answers up top, FAQs below; suitable for citation.`);
+  lines.push(`- [Blog](${SITE}/blog): Answer-first guides — what pages a mortgage website needs, why sites lose customers in two seconds, what small business websites should cost, how to get found on Google without ads. Direct answers up top, FAQs below; suitable for citation.`);
   lines.push(`- [Founder](${SITE}/founder): David Olawuni, Founder of AceVolumes.`);
   lines.push(`- [About](${SITE}/about): The studio story, from 2016 to a worldwide clientele.`);
   lines.push(`- [Contact](${SITE}/contact): Start a project by form or email ${"acevolumesofficial@gmail.com"}. Reply within one working day, Mon–Fri 9am–6pm WAT.`);
