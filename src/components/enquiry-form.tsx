@@ -168,12 +168,14 @@ function EnquiryFormInner() {
       // In the pipeline even if the email notification failed.
       setStatus("sent");
       form.reset();
+      window.location.assign("/thank-you");
       return;
     }
 
     if (emailed) {
       setStatus("sent");
       form.reset();
+      window.location.assign("/thank-you");
       return;
     }
 

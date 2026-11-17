@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // The dashboard still cryptographically verifies the session server-side —
 // this fence is for correct statuses and not leaking that the studio exists.
 
-const PUBLIC_ROUTES = ["/", "/about", "/blog", "/contact", "/founder", "/mortgage", "/services", "/work"];
+const PUBLIC_ROUTES = ["/", "/about", "/blog", "/contact", "/founder", "/mortgage", "/services", "/work", "/privacy", "/terms", "/thank-you"];
 const PATH_RE = /^[a-z0-9]+(-[a-z0-9]+)+$/;
 
 export function middleware(req: NextRequest) {
@@ -64,11 +64,11 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  // Unknown path: hard 404, no body, nothing to fingerprint.
-  return new NextResponse(null, {
-    status: 404,
-    headers: { "X-Robots-Tag": "noindex, nofollow" },
-  });
+  // Unknown paths render through Next: the [gate] catch-all notFound()s wrong
+  // slugs (status-correct, no leak) and the branded not-found page shows for
+  // everything else. The old body-less edge 404 existed for PPR shells; PPR
+  // is gone, so real pages render with correct 404 statuses now.
+  return NextResponse.next();
 }
 
 export const config = {

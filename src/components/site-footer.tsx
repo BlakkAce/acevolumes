@@ -108,7 +108,12 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col gap-3 border-t hairline py-7 text-[13px] muted sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {CURRENT_YEAR} AceVolumes. All rights reserved.</p>
+          <p>
+            &copy; {CURRENT_YEAR} AceVolumes. All rights reserved.{" "}
+            <a href="/privacy" className="underline transition-colors hover:text-[var(--gold)]">Privacy</a>
+            {" · "}
+            <a href="/terms" className="underline transition-colors hover:text-[var(--gold)]">Terms</a>
+          </p>
           <p className="font-mono text-[12px] uppercase tracking-[0.09em]">
             Working since 2016
           </p>

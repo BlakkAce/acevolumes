@@ -19,6 +19,10 @@ export default async function InvoicePrintPage({
 }: {
   params: Promise<{ gate: string; id: string }>;
 }) {
+  // Slug guard BEFORE any await/stream: wrong-slug paths must return a real
+  // 404 status, not a streamed 200 shell with not-found content.
+  const { gate: __gate } = await params;
+  if (__gate !== STUDIO_PATH) notFound();
   // Route is fully dynamic: no prerendered shell exists to be CDN-cached.
   await connection();
   return (

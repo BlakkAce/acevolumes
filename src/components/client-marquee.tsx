@@ -23,7 +23,7 @@ export function ClientStrip() {
           const inner = c.logo ? (
             <Image
               src={c.logo}
-              alt=""
+              alt={`${c.name} logo`}
               width={c.logoW ?? 160}
               height={c.logoH ?? 40}
               sizes="150px"
