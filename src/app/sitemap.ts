@@ -21,7 +21,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ),
     { url: `${BASE}/services`, priority: 0.9, changeFrequency: "monthly", lastModified: now },
     { url: `${BASE}/mortgage`, priority: 0.8, changeFrequency: "monthly", lastModified: now },
-    { url: `${BASE}/about`, priority: 0.7, changeFrequency: "yearly", lastModified: now },
+        { url: `${BASE}/privacy`, priority: 0.3, changeFrequency: "yearly", lastModified: now },
+    { url: `${BASE}/terms`, priority: 0.3, changeFrequency: "yearly", lastModified: now },
+{ url: `${BASE}/about`, priority: 0.7, changeFrequency: "yearly", lastModified: now },
     { url: `${BASE}/founder`, priority: 0.6, changeFrequency: "yearly", lastModified: now },
     { url: `${BASE}/contact`, priority: 0.8, changeFrequency: "yearly", lastModified: now },
   ];
