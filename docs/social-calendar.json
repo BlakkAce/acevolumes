@@ -1,0 +1,366 @@
+{
+ "updated": "2026-11-20",
+ "note": "Chat-side content calendar. Statuses: draft | approved | posted. The executor marks posted entries back into the studio DB (status=buffered) so nothing double-posts.",
+ "slots": [
+  {
+   "id": 50,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-20T16:00:00Z",
+   "status": "draft",
+   "content": "Need e-commerce? You get a store where the product story does the selling — logo files, photos and one hour of your time is all we need. Tell us the goal: https://acevolumes.vercel.app/contact"
+  },
+  {
+   "id": 47,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-20T17:00:00Z",
+   "status": "draft",
+   "content": "Need e-commerce? You get a store where the product story does the selling — logo files, photos and one hour of your time is all we need.\n.\n#AceVolumes #WebDesign #DigitalStudio #BuildSomething"
+  },
+  {
+   "id": 48,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-20T18:00:00Z",
+   "status": "draft",
+   "content": "E-commerce, done properly.\n\nYou bring the goal and you bring logo files, photos and one hour. You get a store where the product story does the selling, shipped with sub-2-second pages, zero third-party scripts, backed by every reply within one working day, US-first timezones.\n\nOne conversation is enough to know if we fit: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 51,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-21T13:00:00Z",
+   "status": "draft",
+   "content": "HCMG Command needed internal loan-pipeline software that gives a lender one source of truth. The mechanism: one founder, one build, no handoffs. See the work: https://acevolumes.vercel.app/work/hcmg-command\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 54,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-21T15:00:00Z",
+   "status": "draft",
+   "content": "HCMG Command needed internal loan-pipeline software that gives a lender one source of truth. The mechanism: one founder, one build, no handoffs. See the work: https://acevolumes.vercel.app/work/hcmg-command"
+  },
+  {
+   "id": 55,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-21T16:00:00Z",
+   "status": "draft",
+   "content": "HCMG Command needed internal loan-pipeline software that gives a lender one source of truth. The mechanism: one founder, one build, no handoffs. See the work: https://acevolumes.vercel.app/work/hcmg-command"
+  },
+  {
+   "id": 52,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-21T17:00:00Z",
+   "status": "draft",
+   "content": "HCMG Command needed internal loan-pipeline software that gives a lender one source of truth. The mechanism: one founder, one build, no handoffs. See the work: https://acevolumes.vercel.app/work/hcmg-command\n.\n#AceVolumes #WebDesign #DigitalStudio #CaseStudy"
+  },
+  {
+   "id": 53,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-21T18:00:00Z",
+   "status": "draft",
+   "content": "Case study: HCMG Command.\n\nThe brief: internal loan-pipeline software that gives a lender one source of truth.\n\nThe mechanism is the point — the founder builds it himself — no handoffs, no account managers, and everything ships with sub-2-second pages, zero third-party scripts.\n\nWalk the full project: https://acevolumes.vercel.app/work/hcmg-command\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 56,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-22T13:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016. sub-2-second pages, zero third-party scripts on every build. You bring logo files, photos and one hour. Start: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 59,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-22T15:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016. sub-2-second pages, zero third-party scripts on every build. You bring logo files, photos and one hour. Start: https://acevolumes.vercel.app/contact"
+  },
+  {
+   "id": 60,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-22T16:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016. sub-2-second pages, zero third-party scripts on every build. You bring logo files, photos and one hour. Start: https://acevolumes.vercel.app/contact"
+  },
+  {
+   "id": 57,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-22T17:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016. sub-2-second pages, zero third-party scripts on every build. You bring logo files, photos and one hour.\n.\n#AceVolumes #WebDesign #DigitalStudio #Proof"
+  },
+  {
+   "id": 58,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-22T18:00:00Z",
+   "status": "draft",
+   "content": "Numbers first, because they are checkable:\n\n• 100+ websites built since 2016\n• sub-2-second pages, zero third-party scripts — verified, not claimed\n• every reply within one working day, US-first timezones\n• you bring logo files, photos and one hour\n\nIf your current site cannot be described in numbers like these, that is the sign.\n\nhttps://acevolumes.vercel.app/work\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 62,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-23T13:00:00Z",
+   "status": "draft",
+   "content": "You do not need more traffic. You need the page to answer the question that brought the visitor. Traffic amplifies a funnel; it never repairs one.\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 61,
+   "platform": "linkedin",
+   "channelId": "6af53c2f62b70b94b001b4d8",
+   "account": "1",
+   "scheduledFor": "2026-11-23T14:00:00Z",
+   "status": "draft",
+   "content": "You do not need more traffic. You need the page to answer the question that brought the visitor. Traffic amplifies a funnel; it never repairs one.\n\nWe audit sites like this every week at AceVolumes. If yours is quietly losing leads, a one-hour review finds exactly where: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier.\n\n#AceVolumes #WebDesign #DigitalStudio #Contrarian"
+  },
+  {
+   "id": 65,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-23T15:00:00Z",
+   "status": "draft",
+   "content": "You do not need more traffic. You need the page to answer the question that brought the visitor. Traffic amplifies a funnel; it never repairs one."
+  },
+  {
+   "id": 66,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-23T16:00:00Z",
+   "status": "draft",
+   "content": "You do not need more traffic. You need the page to answer the question that brought the visitor. Traffic amplifies a funnel; it never repairs one."
+  },
+  {
+   "id": 63,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-23T17:00:00Z",
+   "status": "draft",
+   "content": "You do not need more traffic. You need the page to answer the question that brought the visitor. Traffic amplifies a funnel; it never repairs one.\n.\n#AceVolumes #WebDesign #DigitalStudio #Contrarian"
+  },
+  {
+   "id": 64,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-23T18:00:00Z",
+   "status": "draft",
+   "content": "You do not need more traffic. You need the page to answer the question that brought the visitor. Traffic amplifies a funnel; it never repairs one.\n\nWe audit sites like this every week at AceVolumes. If yours is quietly losing leads, a one-hour review finds exactly where: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 68,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-24T13:00:00Z",
+   "status": "draft",
+   "content": "The best time to look established online was before your next client searched for you. The second best time is this week.\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 67,
+   "platform": "linkedin",
+   "channelId": "6af53c2f62b70b94b001b4d8",
+   "account": "1",
+   "scheduledFor": "2026-11-24T14:00:00Z",
+   "status": "draft",
+   "content": "The best time to look established online was before your next client searched for you. The second best time is this week.\n\nThe fix is rarely more marketing. It is a page that answers, loads fast and reads like the professional they hoped to find: https://acevolumes.vercel.app/services\n\nDigital systems that make results easier.\n\n#AceVolumes #WebDesign #DigitalStudio #Conversion"
+  },
+  {
+   "id": 71,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-24T15:00:00Z",
+   "status": "draft",
+   "content": "The best time to look established online was before your next client searched for you. The second best time is this week."
+  },
+  {
+   "id": 72,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-24T16:00:00Z",
+   "status": "draft",
+   "content": "The best time to look established online was before your next client searched for you. The second best time is this week."
+  },
+  {
+   "id": 69,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-24T17:00:00Z",
+   "status": "draft",
+   "content": "The best time to look established online was before your next client searched for you. The second best time is this week.\n.\n#AceVolumes #WebDesign #DigitalStudio #Conversion"
+  },
+  {
+   "id": 70,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-24T18:00:00Z",
+   "status": "draft",
+   "content": "The best time to look established online was before your next client searched for you. The second best time is this week.\n\nThe fix is rarely more marketing. It is a page that answers, loads fast and reads like the professional they hoped to find: https://acevolumes.vercel.app/services\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 74,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-25T13:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016, and I still build every one myself. Small on purpose: you get senior hands or you get nothing.\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 73,
+   "platform": "linkedin",
+   "channelId": "6af53c2f62b70b94b001b4d8",
+   "account": "1",
+   "scheduledFor": "2026-11-25T14:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016, and I still build every one myself. Small on purpose: you get senior hands or you get nothing.\n\nMore about the studio and the work: https://acevolumes.vercel.app/founder\n\nDigital systems that make results easier.\n\n#AceVolumes #WebDesign #DigitalStudio #Founder"
+  },
+  {
+   "id": 77,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-25T15:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016, and I still build every one myself. Small on purpose: you get senior hands or you get nothing."
+  },
+  {
+   "id": 78,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-25T16:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016, and I still build every one myself. Small on purpose: you get senior hands or you get nothing."
+  },
+  {
+   "id": 75,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-25T17:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016, and I still build every one myself. Small on purpose: you get senior hands or you get nothing.\n.\n#AceVolumes #WebDesign #DigitalStudio #Founder"
+  },
+  {
+   "id": 76,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-25T18:00:00Z",
+   "status": "draft",
+   "content": "100+ websites built since 2016, and I still build every one myself. Small on purpose: you get senior hands or you get nothing.\n\nMore about the studio and the work: https://acevolumes.vercel.app/founder\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 80,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-26T13:00:00Z",
+   "status": "draft",
+   "content": "Small-business season: the shops that look alive online sell more offline.\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 79,
+   "platform": "linkedin",
+   "channelId": "6af53c2f62b70b94b001b4d8",
+   "account": "1",
+   "scheduledFor": "2026-11-26T14:00:00Z",
+   "status": "draft",
+   "content": "Small-business season: the shops that look alive online sell more offline.\n\nA launch takes weeks, and the calendar does not negotiate. Start with one conversation: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier.\n\n#AceVolumes #WebDesign #DigitalStudio #BuildNow"
+  },
+  {
+   "id": 83,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-26T15:00:00Z",
+   "status": "draft",
+   "content": "Small-business season: the shops that look alive online sell more offline."
+  },
+  {
+   "id": 84,
+   "platform": "threads",
+   "channelId": "6af533a062b70b94b001597c",
+   "account": "2",
+   "scheduledFor": "2026-11-26T16:00:00Z",
+   "status": "draft",
+   "content": "Small-business season: the shops that look alive online sell more offline."
+  },
+  {
+   "id": 81,
+   "platform": "instagram",
+   "channelId": "66148c22f1ac4a3c94037c95",
+   "account": "1",
+   "scheduledFor": "2026-11-26T17:00:00Z",
+   "status": "draft",
+   "content": "Small-business season: the shops that look alive online sell more offline.\n.\n#AceVolumes #WebDesign #DigitalStudio #BuildNow"
+  },
+  {
+   "id": 82,
+   "platform": "pinterest",
+   "channelId": "6af5352062b70b94b0016472",
+   "account": "2",
+   "scheduledFor": "2026-11-26T18:00:00Z",
+   "status": "draft",
+   "content": "Small-business season: the shops that look alive online sell more offline.\n\nA launch takes weeks, and the calendar does not negotiate. Start with one conversation: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier.\n\nSave this. #AceVolumes #WebDesign"
+  },
+  {
+   "id": 86,
+   "platform": "facebook",
+   "channelId": "66148c5df1ac4a3c9404c724",
+   "account": "1",
+   "scheduledFor": "2026-11-27T13:00:00Z",
+   "status": "draft",
+   "content": "Need branding? You get a brand that reads like the professional they hoped to find — logo files, photos and one hour of your time is all we need. Tell us the goal: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier."
+  },
+  {
+   "id": 85,
+   "platform": "linkedin",
+   "channelId": "6af53c2f62b70b94b001b4d8",
+   "account": "1",
+   "scheduledFor": "2026-11-27T14:00:00Z",
+   "status": "draft",
+   "content": "Branding, done properly.\n\nYou bring the goal and you bring logo files, photos and one hour. You get a brand that reads like the professional they hoped to find, shipped with sub-2-second pages, zero third-party scripts, backed by every reply within one working day, US-first timezones.\n\nOne conversation is enough to know if we fit: https://acevolumes.vercel.app/contact\n\nDigital systems that make results easier.\n\n#AceVolumes #WebDesign #DigitalStudio #BuildSomething"
+  },
+  {
+   "id": 89,
+   "platform": "x",
+   "channelId": "6af5341562b70b94b0015cf2",
+   "account": "2",
+   "scheduledFor": "2026-11-27T15:00:00Z",
+   "status": "draft",
+   "content": "Need branding? You get a brand that reads like the professional they hoped to find — logo files, photos and one hour of your time is all we need. Tell us the goal: https://acevolumes.vercel.app/contact"
+  }
+ ]
+}
