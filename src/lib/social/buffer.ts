@@ -155,6 +155,7 @@ export async function bufferCreate(opts: {
   scheduledAt: Date;
   photoUrl?: string | null;
   accountKey?: BufferAccountKey;
+  platform?: string;
 }): Promise<BufferCreateResult> {
   const token = bufferAccounts().find((a) => a.key === (opts.accountKey ?? "1"))?.token
     ?? bufferAccounts()[0]?.token;
@@ -162,6 +163,13 @@ export async function bufferCreate(opts: {
   const assets = opts.photoUrl
     ? `, assets: [{ image: { url: "${opts.photoUrl}" } }]`
     : "";
+  // Platform metadata Buffer requires: IG + FB need a post type, Pinterest a board.
+  const pinBoard = process.env.PINTEREST_BOARD_ID?.trim() ?? "";
+  let metadata = "";
+  if (opts.platform === "instagram") metadata = `\n    metadata: { instagram: { type: post, shouldShareToFeed: true } },`;
+  else if (opts.platform === "facebook") metadata = `\n    metadata: { facebook: { type: post } },`;
+  else if (opts.platform === "pinterest" && pinBoard)
+    metadata = `\n    metadata: { pinterest: { boardServiceId: "${pinBoard}" } },`;
   const text = opts.text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   try {
     const data = await gql<{
@@ -174,7 +182,7 @@ export async function bufferCreate(opts: {
     channelId: "${opts.profileId}",
     schedulingType: automatic,
     mode: customScheduled,
-    dueAt: "${opts.scheduledAt.toISOString()}"${assets}
+    dueAt: "${opts.scheduledAt.toISOString()}"${assets}${metadata}
   }) {
     ... on PostActionSuccess { post { id dueAt } }
     ... on MutationError { message }

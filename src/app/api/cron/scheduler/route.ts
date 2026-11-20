@@ -53,6 +53,7 @@ export async function GET(req: Request) {
           text: row.content,
           scheduledAt: row.scheduledFor,
           photoUrl,
+          platform: row.platform,
         });
         if (outcome.ok) {
           await db

@@ -30,8 +30,15 @@ PY
   curl -s -L "https://acevolumes.vercel.app/api/social/preview?id=${ID}&platform=${PLATFORM}" -o /dev/null
   BANNER="https://acevolumes.vercel.app/api/media/banner-${ID}-${SHAPE}"
   TEXTJSON=$(echo "$ROW" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin)['content']))")
+  # Platform metadata Buffer requires: IG + FB need a type, Pinterest needs a board.
+  case "$PLATFORM" in
+    instagram) META=', "metadata": {"instagram": {"type": "post", "shouldShareToFeed": true}}' ;;
+    facebook)  META=', "metadata": {"facebook": {"type": "post"}}' ;;
+    pinterest) if [ -n "${PINTEREST_BOARD:-}" ]; then META=', "metadata": {"pinterest": {"boardServiceId": "'"$PINTEREST_BOARD"'"}}'; else echo "id $ID (pinterest): SKIPPED - no board yet (create one in Pinterest, then export PINTEREST_BOARD=<boardId>)"; FAILED=$((FAILED+1)); continue; fi ;;
+    *) META="" ;;
+  esac
   RES=$(curl -s -X POST "https://api.buffer.com" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d @- <<GQL
-{"query":"mutation(\$input: CreatePostInput!) { createPost(input: \$input) { ... on PostActionSuccess { post { id dueAt } } ... on MutationError { message } } }","variables":{"input":{"text":$TEXTJSON,"channelId":"$CHANNEL","schedulingType":"automatic","mode":"customScheduled","dueAt":"$DUE","assets":[{"image":{"url":"$BANNER"}}]}}}
+{"query":"mutation(\$input: CreatePostInput!) { createPost(input: \$input) { ... on PostActionSuccess { post { id dueAt } } ... on MutationError { message } } }","variables":{"input":{"text":$TEXTJSON,"channelId":"$CHANNEL","schedulingType":"automatic","mode":"customScheduled","dueAt":"$DUE"$META,"assets":[{"image":{"url":"$BANNER"}}]}}}
 GQL
 )
   OK=$(echo "$RES" | python3 -c "import json,sys; d=json.load(sys.stdin); print('yes' if d.get('data',{}).get('createPost',{}).get('post') else 'no')" 2>/dev/null || echo no)
