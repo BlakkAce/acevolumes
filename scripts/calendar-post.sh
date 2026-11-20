@@ -25,8 +25,13 @@ PY
   TEXT=$(echo "$ROW" | python3 -c "import json,sys,base64; print(base64.b64encode(json.load(sys.stdin)['content'].encode()).decode())")
   KEYVAR="BUFFER_KEY_$ACCT"; KEY="${!KEYVAR}"
   [ -n "$KEY" ] || { echo "id $ID: no key for account $ACCT"; FAILED=$((FAILED+1)); continue; }
+  # Banner: ensure the post's branded banner exists on prod, attach its URL.
+  SHAPE=land; case "$PLATFORM" in instagram|pinterest) SHAPE=sq ;; esac
+  curl -s -L "https://acevolumes.vercel.app/api/social/preview?id=${ID}&platform=${PLATFORM}" -o /dev/null
+  BANNER="https://acevolumes.vercel.app/api/media/banner-${ID}-${SHAPE}"
+  TEXTJSON=$(echo "$ROW" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin)['content']))")
   RES=$(curl -s -X POST "https://api.buffer.com" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d @- <<GQL
-{"query":"mutation(\$input: CreatePostInput!) { createPost(input: \$input) { ... on PostActionSuccess { post { id dueAt } } ... on MutationError { message } } }","variables":{"input":{"text":"$(echo "$ROW" | python3 -c "import json,sys; print(json.load(sys.stdin)['content'].replace(chr(34),chr(92)+chr(34)).replace(chr(10),chr(92)+'n'))")","channelId":"$CHANNEL","schedulingType":"automatic","mode":"customScheduled","dueAt":"$DUE"}}}
+{"query":"mutation(\$input: CreatePostInput!) { createPost(input: \$input) { ... on PostActionSuccess { post { id dueAt } } ... on MutationError { message } } }","variables":{"input":{"text":$TEXTJSON,"channelId":"$CHANNEL","schedulingType":"automatic","mode":"customScheduled","dueAt":"$DUE","assets":[{"image":{"url":"$BANNER"}}]}}}
 GQL
 )
   OK=$(echo "$RES" | python3 -c "import json,sys; d=json.load(sys.stdin); print('yes' if d.get('data',{}).get('createPost',{}).get('post') else 'no')" 2>/dev/null || echo no)
