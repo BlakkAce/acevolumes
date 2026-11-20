@@ -4,6 +4,11 @@
  * carries valid FAQPage schema. AI engines cite pages that answer cleanly.
  */
 
+import { POSTS_EXTRA_1 } from "./blog-extra-1";
+import { POSTS_EXTRA_2 } from "./blog-extra-2";
+import { POSTS_EXTRA_3 } from "./blog-extra-3";
+import { POSTS_EXTRA_4 } from "./blog-extra-4";
+
 export type Block =
   | { t: "p"; text: string }
   | { t: "h"; text: string }
@@ -22,7 +27,7 @@ export type Post = {
   faq: { q: string; a: string }[];
 };
 
-export const POSTS: Post[] = [
+const BASE_POSTS: Post[] = [
   {
     slug: "what-pages-does-a-mortgage-website-need",
     title: "What pages does a mortgage website need? The 2026 checklist",
@@ -262,6 +267,14 @@ export const POSTS: Post[] = [
   },
 ];
 
+
+export const POSTS: Post[] = [
+  ...BASE_POSTS,
+  ...POSTS_EXTRA_1,
+  ...POSTS_EXTRA_2,
+  ...POSTS_EXTRA_3,
+  ...POSTS_EXTRA_4,
+];
 
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);

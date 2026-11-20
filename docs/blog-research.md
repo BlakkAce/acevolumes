@@ -29,7 +29,10 @@
 | custom website vs template price | FAQ inside post 3 | covered |
 | how to get your business found on google without ads | /blog/how-to-get-your-business-found-on-google-without-ads | live |
 
+## Nov 14 2026 expansion
+20 additional posts shipped in one pass (batches blog-extra-1..4): AEO, loan-officer checklist, landing vs website, build timelines, homepage above-the-fold, website vs social, domain choice, CRM, maintenance, Google reviews, contact page, security, logo-before-website, SEO plain-english, copy framework, bookings, DMs vs store, redesign cost, breakage prevention, briefing a designer. Blog totals 24 posts. Next pass: mine fresh queries per the monthly routine.
+
 ## Next queries to write (queue)
-- "What is AEO / how do I get my business cited by AI assistants"
-- "Website checklist for loan officers (personal brand under a brokerage)"
-- "Landing page vs website: which does a small business need first?"
+- "What is AEO / how do I get my business cited by AI assistants" -> live (/blog/what-is-aeo-how-to-get-cited-by-ai-assistants)
+- "Website checklist for loan officers" -> live (/blog/loan-officer-website-checklist)
+- "Landing page vs website" -> live (/blog/landing-page-vs-website-small-business)
