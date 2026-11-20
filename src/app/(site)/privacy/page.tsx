@@ -38,8 +38,10 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>Anonymous pageview counts.</strong> Each visit records the
-              page path and the referring site, with no cookie, no identifier and
-              no cross-site tracking. We cannot single you out and do not try.
+              page path, the referring site, and a rough location (country and
+              city, derived from connection routing by our hosting layer). No
+              cookie, no identifier, no cross-site tracking, and IP addresses
+              are never stored. We cannot single you out and do not try.
             </li>
             <li>
               <strong>Nothing else.</strong> No advertising pixels, no session

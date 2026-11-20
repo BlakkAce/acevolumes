@@ -32,6 +32,16 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ago(d: Date | string): string {
+  const ms = Date.now() - new Date(d).getTime();
+  const m = Math.floor(ms / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
 async function TrafficSection({ base }: { base: string }) {
   const db = getDb();
   const since = sql`now() - interval '7 days'`;
@@ -56,6 +66,33 @@ async function TrafficSection({ base }: { base: string }) {
     .groupBy(pageviews.referrer)
     .orderBy(desc(sql`count(*)`))
     .limit(5);
+  const topCountries = await db
+    .select({ country: pageviews.country, n: sql<number>`count(*)` })
+    .from(pageviews)
+    .where(and(gte(pageviews.createdAt, since), eq(pageviews.isBot, false), ne(pageviews.country, "")))
+    .groupBy(pageviews.country)
+    .orderBy(desc(sql`count(*)`))
+    .limit(5);
+  const topCities = await db
+    .select({ city: pageviews.city, country: pageviews.country, n: sql<number>`count(*)` })
+    .from(pageviews)
+    .where(and(gte(pageviews.createdAt, since), eq(pageviews.isBot, false), ne(pageviews.city, "")))
+    .groupBy(pageviews.city, pageviews.country)
+    .orderBy(desc(sql`count(*)`))
+    .limit(6);
+  const latest = await db
+    .select({
+      path: pageviews.path,
+      city: pageviews.city,
+      country: pageviews.country,
+      referrer: pageviews.referrer,
+      device: pageviews.device,
+      at: pageviews.createdAt,
+    })
+    .from(pageviews)
+    .where(eq(pageviews.isBot, false))
+    .orderBy(desc(pageviews.createdAt))
+    .limit(8);
 
   return (
     <section
@@ -82,6 +119,49 @@ async function TrafficSection({ base }: { base: string }) {
         <div>
           <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Referrer sources</p>
           <p className="mt-1 text-2xl font-semibold tabular-nums">{topRefs.length}</p>
+        </div>
+      </div>
+      <div className="mt-5 border-t pt-4" style={{ borderColor: "color-mix(in oklab, var(--fg) 10%, transparent)" }}>
+        <p className="font-mono text-[11px] uppercase tracking-wider opacity-60">Who and where, last 7 days</p>
+        <div className="mt-3 grid gap-4 sm:grid-cols-3">
+          <div>
+            <p className="text-xs opacity-50">Top countries</p>
+            <ul className="mt-2 space-y-1 text-sm tabular-nums">
+              {topCountries.length === 0 && <li className="opacity-40">No located visits yet</li>}
+              {topCountries.map((r) => (
+                <li key={r.country} className="flex justify-between gap-4">
+                  <span className="opacity-80">{r.country}</span>
+                  <span>{Number(r.n)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs opacity-50">Top cities</p>
+            <ul className="mt-2 space-y-1 text-sm tabular-nums">
+              {topCities.length === 0 && <li className="opacity-40">No located visits yet</li>}
+              {topCities.map((r) => (
+                <li key={`${r.city}-${r.country}`} className="flex justify-between gap-4">
+                  <span className="truncate opacity-80">{r.city}, {r.country}</span>
+                  <span>{Number(r.n)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs opacity-50">Latest visits</p>
+            <ul className="mt-2 space-y-1 text-[13px]">
+              {latest.map((r, i) => (
+                <li key={i} className="flex justify-between gap-3">
+                  <span className="truncate opacity-80">
+                    {r.city || r.country ? `${r.city || r.country}` : "Unknown"}
+                    <span className="opacity-50"> · {r.path}</span>
+                  </span>
+                  <span className="shrink-0 opacity-50">{ago(r.at)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
       {topPaths.length > 0 ? (

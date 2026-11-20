@@ -72,6 +72,11 @@ export const pageviews = pgTable("pageviews", {
   path: text("path").notNull(),
   referrer: text("referrer").notNull().default(""),
   device: text("device").notNull().default("desktop"),
+  // Coarse location from the edge (Vercel geo headers): country code, region,
+  // city. Derived from connection routing, never stored with an IP.
+  country: text("country").notNull().default(""),
+  region: text("region").notNull().default(""),
+  city: text("city").notNull().default(""),
   isBot: boolean("is_bot").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
