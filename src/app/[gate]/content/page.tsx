@@ -121,7 +121,7 @@ async function pushToBuffer() {
       errors.push(`${row.platform}: no Buffer channel connected`);
       continue;
     }
-    const photoUrl = await ensureMediaUrl(row.mediaRef, row.id);
+    const photoUrl = await ensureMediaUrl(row.mediaRef, row.id, row.platform, row.content);
     const outcome = await bufferCreate({
       profileId: target.profileId,
       accountKey: target.accountKey,
@@ -378,7 +378,7 @@ async function Content({
                     {r.status !== "posted" ? (
                       // eslint-disable-next-line @next/next/no-img-element -- tiny admin-queue preview, not user-facing LCP
                       <img
-                        src={`/api/social/preview?ref=${encodeURIComponent(r.mediaRef ?? "")}&id=${r.id}`}
+                        src={`/api/social/preview?ref=${encodeURIComponent(r.mediaRef ?? "")}&id=${r.id}&platform=${r.platform}`}
                         alt=""
                         width={88}
                         height={88}

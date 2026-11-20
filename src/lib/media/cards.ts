@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb, dbConfigured } from "@/lib/db";
-import { mediaAssets } from "@/lib/db/schema";
+import { mediaAssets, posts } from "@/lib/db/schema";
+import { headlineFromContent, renderBannerPng, type BannerShape } from "./banners";
 
 /**
  * Branded social cards, generated server-side. Deliberately geometric (no
@@ -113,29 +114,77 @@ async function generateIllustration(postId: number, variant: number): Promise<st
   }
 }
 
-/** Returns a public image URL for the post: existing asset, AI illustration (when configured), or brand card. */
-export async function ensureMediaUrl(mediaRef: string | null, postId: number): Promise<string | null> {
+const SQUARE_PLATFORMS = new Set(["instagram", "pinterest"]);
+
+/**
+ * Returns a public image URL for the post. Order: explicit mediaRef, AI
+ * illustration (when GEMINI_API_KEY is set), then a per-post branded banner
+ * (the post's hook rendered in brand type), then the geometric brand card.
+ */
+export async function ensureMediaUrl(
+  mediaRef: string | null,
+  postId: number,
+  platform = "facebook",
+  content?: string,
+): Promise<string | null> {
   if (mediaRef) {
     return mediaRef.startsWith("http") ? mediaRef : `${SITE}${mediaRef}`;
   }
   if (!dbConfigured()) return null;
   const ai = await generateIllustration(postId, postId);
   if (ai) return ai;
+
+  const shape: BannerShape = SQUARE_PLATFORMS.has(platform) ? "sq" : "land";
+  const id = `banner-${postId}-${shape}`;
   const db = getDb();
-  const id = `card-${postId}-${postId % 2}`;
+  const bannerExisting = await db
+    .select({ id: mediaAssets.id })
+    .from(mediaAssets)
+    .where(eq(mediaAssets.id, id))
+    .limit(1);
+  if (bannerExisting.length > 0) return `${SITE}/api/media/${id}`;
+
+  // Content is what makes each banner unique (its hook). Callers that do not
+  // pass it (previews) read it from the post row directly.
+  let text = content ?? "";
+  if (!text) {
+    const [row] = await db
+      .select({ content: posts.content })
+      .from(posts)
+      .where(eq(posts.id, postId))
+      .limit(1);
+    text = row?.content ?? "";
+  }
+
+  try {
+    const png = await renderBannerPng({
+      headline: headlineFromContent(text, shape),
+      shape,
+      variant: postId,
+    });
+    await db
+      .insert(mediaAssets)
+      .values({ id, mime: "image/png", data: png.toString("base64") })
+      .onConflictDoNothing();
+    return `${SITE}/api/media/${id}`;
+  } catch (err) {
+    console.error("[banners] render failed:", err instanceof Error ? err.message : err);
+  }
+
+  const id2 = `card-${postId}-${postId % 2}`;
   const existing = await db
     .select({ id: mediaAssets.id })
     .from(mediaAssets)
-    .limit(1)
-    .then((rows) => rows.find((r) => r.id === id));
-  if (!existing) {
+    .where(eq(mediaAssets.id, id2))
+    .limit(1);
+  if (existing.length === 0) {
     const svg = card(postId);
     const { default: sharp } = await import("sharp");
     const png = await sharp(Buffer.from(svg)).png().toBuffer();
     await db
       .insert(mediaAssets)
-      .values({ id, mime: "image/png", data: png.toString("base64") })
+      .values({ id: id2, mime: "image/png", data: png.toString("base64") })
       .onConflictDoNothing();
   }
-  return `${SITE}/api/media/${id}`;
+  return `${SITE}/api/media/${id2}`;
 }

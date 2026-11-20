@@ -46,7 +46,7 @@ export async function GET(req: Request) {
         continue;
       }
       for (const row of rows) {
-        const photoUrl = await ensureMediaUrl(row.mediaRef, row.id);
+        const photoUrl = await ensureMediaUrl(row.mediaRef, row.id, row.platform, row.content);
         const outcome = await bufferCreate({
           profileId: target.profileId,
           accountKey: target.accountKey,
