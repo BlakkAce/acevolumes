@@ -32,11 +32,27 @@ async function font(name: string): Promise<ArrayBuffer> {
   return buf;
 }
 
+let logoCache: string | null = null;
+/**
+ * Brand logo (cream strokes, transparent) as a data URI — fetched from the
+ * site's own /media directory like the fonts: serverless-safe, and satori
+ * embeds it directly into the render.
+ */
+async function logoDataUrl(): Promise<string> {
+  if (!logoCache) {
+    const res = await fetch(`${SITE}/media/logo-cream.png`);
+    if (!res.ok) throw new Error(`logo fetch failed (${res.status})`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    logoCache = `data:image/png;base64,${buf.toString("base64")}`;
+  }
+  return logoCache;
+}
+
 export type BannerShape = "sq" | "land";
 
-const DIM: Record<BannerShape, { w: number; h: number; head: number; line: number; kick: number; foot: number; maxChars: number }> = {
-  sq: { w: 1080, h: 1080, head: 82, line: 30, kick: 26, foot: 26, maxChars: 80 },
-  land: { w: 1200, h: 675, head: 62, line: 34, kick: 22, foot: 22, maxChars: 92 },
+const DIM: Record<BannerShape, { w: number; h: number; head: number; line: number; kick: number; foot: number; logo: number; maxChars: number }> = {
+  sq: { w: 1080, h: 1080, head: 80, line: 22, kick: 26, foot: 24, logo: 66, maxChars: 66 },
+  land: { w: 1200, h: 675, head: 60, line: 34, kick: 22, foot: 22, logo: 52, maxChars: 92 },
 };
 
 /**
@@ -68,14 +84,22 @@ export function headlineFromContent(content: string, shape: BannerShape): string
   line = line.replace(/\s*Save this\.\s*.*$/, "");
   line = line.replace(/#[A-Za-z0-9_]+/g, "").replace(/\s{2,}/g, " ").trim();
   line = line.replace(/[.,;:\s]+$/, "");
-  // Prefer complete sentences: a headline that ends mid-thought reads badly.
+  // Prefer complete sentence(s) that fit the canvas: a headline that ends
+  // mid-thought (or wraps ragged) reads badly. Accumulate sentences up to the
+  // cap; if the very first one is too long, use the first later sentence that
+  // fits before resorting to a clause cut.
   const sentences = line.split(/(?<=[.!?])\s+/).filter(Boolean);
-  let pick = sentences[0] ?? line;
-  if (pick.length < 24 && sentences.length > 1) {
-    const two = `${pick} ${sentences[1]}`;
-    if (two.length <= cap) pick = two;
+  let acc = "";
+  for (const sn of sentences) {
+    const cand = acc ? `${acc} ${sn}` : sn;
+    if (cand.length <= cap) acc = cand;
+    else break;
+    if (acc.length >= 36) break;
   }
-  return smartCut(pick, cap);
+  if (acc.length >= 24) return acc;
+  const fits = sentences.find((sn) => sn.length >= 24 && sn.length <= cap);
+  if (fits) return fits;
+  return smartCut(sentences[0] ?? line, cap);
 }
 
 /** Split into balanced display lines that fit the canvas width (max 3). */
@@ -98,7 +122,20 @@ function splitLines(text: string, shape: BannerShape): string[] {
     const kept = lines.slice(0, 2);
     const rest = lines.slice(2).join(" ");
     kept.push(smartCut(rest, per - 1));
-    return kept;
+    lines.length = 0;
+    lines.push(...kept);
+  }
+  // Rebalance: no one-word widow lines, no overlong last lines.
+  for (let i = 0; i < 3; i += 1) {
+    const last = lines[lines.length - 1] ?? "";
+    const prev = lines[lines.length - 2];
+    if (!prev) break;
+    const prevWords = prev.split(" ");
+    if (last.length < Math.max(8, Math.round(per * 0.3)) && prevWords.length > 2) {
+      const moved = prevWords.pop();
+      lines[lines.length - 2] = prevWords.join(" ");
+      lines[lines.length - 1] = `${moved} ${last}`.trim();
+    } else break;
   }
   return lines;
 }
@@ -150,7 +187,7 @@ function bars(seed: number, height: number, count = 9): React.ReactNode[] {
   return out;
 }
 
-function BrandFooter({ shape }: { shape: BannerShape }): React.ReactNode {
+function BrandFooter({ shape, logo }: { shape: BannerShape; logo: string }): React.ReactNode {
   const d = DIM[shape];
   return (
     <div
@@ -161,31 +198,12 @@ function BrandFooter({ shape }: { shape: BannerShape }): React.ReactNode {
         justifyContent: "space-between",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <svg
-          width={d.foot + 8}
-          height={d.foot + 8}
-          viewBox="0 0 60 52"
-          fill="none"
-          stroke={CREAM}
-          strokeWidth={4.6}
-          strokeLinecap="square"
-        >
-          <path d="M13.5 41 L23.5 14.5 L33.5 41" />
-          <line x1="17.7" y1="29.5" x2="29.3" y2="29.5" />
-          <path d="M35 14.5 L44.5 41 L54 14.5" />
-        </svg>
-        <span
-          style={{
-            color: CREAM,
-            fontSize: d.foot,
-            fontWeight: 600,
-            letterSpacing: 2,
-          }}
-        >
-          AceVolumes
-        </span>
-      </div>
+      <img
+        src={logo}
+        width={Math.round(d.logo * 1.5)}
+        height={d.logo}
+        style={{ display: "flex" }}
+      />
       <span
         style={{
           color: CREAM,
@@ -263,6 +281,7 @@ export async function renderBannerPng(opts: {
 }): Promise<Buffer> {
   const { headline, shape, variant } = opts;
   const d = DIM[shape];
+  const logo = await logoDataUrl();
   const lines = splitLines(headline, shape);
   const centered = variant % 3 === 1;
   const barsHeavy = variant % 3 === 2;
@@ -293,9 +312,9 @@ export async function renderBannerPng(opts: {
             left: 220,
           }}
         />
-        <Kicker shape={shape} />
+        <img src={logo} width={252} height={168} style={{ display: "flex" }} />
         <Headline lines={lines} shape={shape} align="center" />
-        <BrandFooter shape={shape} />
+        <BrandFooter shape={shape} logo={logo} />
       </div>
     ) : (
       <div
@@ -350,7 +369,7 @@ export async function renderBannerPng(opts: {
           ) : (
             <div style={{ display: "flex", height: 20 }} />
           )}
-          <BrandFooter shape={shape} />
+          <BrandFooter shape={shape} logo={logo} />
         </div>
       </div>
     );
