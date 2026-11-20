@@ -32,6 +32,7 @@ CHANNEL_CAP = 10  # Buffer free plan: max 10 unsent posts queued per channel
 FACTS = {
     "projects": [
         ("Instafiloans", "a loan-pipeline portal borrowers actually finish", "instafiloans.com"),
+        ("HCMG Loans", "a mortgage site that turns rate-shoppers into applicants", "hcmgloans.com"),
         ("Excel Realty", "a real-estate team site with listings that sell themselves", "teamerm.com"),
         ("The Tab Team", "a service site that books tabs while you sleep", "thetabteam.org"),
         ("TrueTerra Oils", "an e-commerce store where the product story does the selling", "trueterraoils.com"),
