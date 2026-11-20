@@ -1,6 +1,4 @@
 import { ImageResponse } from "next/og";
-import { readFileSync } from "fs";
-import path from "path";
 
 /**
  * Branded social banners with real typography (satori via next/og).
@@ -9,17 +7,26 @@ import path from "path";
  * pre-instanced from the brand's variable fonts (public/fonts).
  */
 
+const SITE =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "https://acevolumes.vercel.app";
+
 const PLUM = "#3b153a";
 const PLUM_DEEP = "#2a0f29";
 const CREAM = "#fbf4e7";
 const GOLD = "#cf9d3f";
 
 const fontCache = new Map<string, ArrayBuffer>();
-function font(name: string): ArrayBuffer {
+/**
+ * Fonts are fetched from the site's own /fonts directory: works on any host
+ * (serverless bundles do not reliably include files read via readFileSync).
+ */
+async function font(name: string): Promise<ArrayBuffer> {
   let buf = fontCache.get(name);
   if (!buf) {
-    buf = readFileSync(path.join(process.cwd(), "public", "fonts", name))
-      .buffer as ArrayBuffer;
+    const res = await fetch(`${SITE}/fonts/${name}`);
+    if (!res.ok) throw new Error(`font fetch failed: ${name} (${res.status})`);
+    buf = await res.arrayBuffer();
     fontCache.set(name, buf);
   }
   return buf;
@@ -368,9 +375,9 @@ export async function renderBannerPng(opts: {
       width: d.w,
       height: d.h,
       fonts: [
-        { name: "Archivo", data: font("archivo-700.ttf"), weight: 700, style: "normal" },
-        { name: "Archivo", data: font("archivo-500.ttf"), weight: 500, style: "normal" },
-        { name: "SpaceGrotesk", data: font("space-grotesk-600.ttf"), weight: 600, style: "normal" },
+        { name: "Archivo", data: await font("archivo-700.ttf"), weight: 700, style: "normal" },
+        { name: "Archivo", data: await font("archivo-500.ttf"), weight: 500, style: "normal" },
+        { name: "SpaceGrotesk", data: await font("space-grotesk-600.ttf"), weight: 600, style: "normal" },
       ],
     },
   );
