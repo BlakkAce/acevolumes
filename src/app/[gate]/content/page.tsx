@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import { asc, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { getDb, dbConfigured } from "@/lib/db";
 import { posts, socialAccounts, agentRuns } from "@/lib/db/schema";
@@ -14,6 +14,7 @@ import { verifySessionToken } from "@/lib/studio/session";
 import { SESSION_COOKIE } from "@/lib/studio/config";
 import { LoginView } from "../login-view";
 import { GateStream } from "../gate-stream";
+import { SubmitButton } from "./submit-button";
 
 // Auth-gated studio page: block instead of streaming a shell.
 
@@ -88,7 +89,12 @@ async function saveEdit(formData: FormData) {
 
 async function pushToBuffer() {
   "use server";
-  if (!dbConfigured() || !bufferTokenAny()) return;
+  if (!dbConfigured()) {
+    redirect(`/${STUDIO_PATH}/content?msg=${encodeURIComponent("Database not configured, so nothing can be pushed.")}`);
+  }
+  if (!bufferTokenAny()) {
+    redirect(`/${STUDIO_PATH}/content?msg=${encodeURIComponent("No Buffer connection found. Open Connections and re-sync first.")}`);
+  }
   const db = getDb();
   const now = new Date();
   const horizon = new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000);
@@ -102,6 +108,11 @@ async function pushToBuffer() {
         lte(posts.scheduledFor, horizon),
       ),
     );
+  if (due.length === 0) {
+    redirect(
+      `/${STUDIO_PATH}/content?msg=${encodeURIComponent("Nothing to push yet: approve drafts below (tap Approve), then push again.")}`,
+    );
+  }
   let pushed = 0;
   const errors: string[] = [];
   for (const row of due) {
@@ -135,6 +146,10 @@ async function pushToBuffer() {
     meta: JSON.stringify({ pushed, errors }),
   });
   revalidatePath(`/${STUDIO_PATH}/content`);
+  const summary = errors.length
+    ? `Pushed ${pushed} to Buffer; ${errors.length} failed: ${errors.join(" · ").slice(0, 200)}`
+    : `Pushed ${pushed} post${pushed === 1 ? "" : "s"} to Buffer. They publish at their scheduled hours.`;
+  redirect(`/${STUDIO_PATH}/content?pushed=${pushed}&msg=${encodeURIComponent(summary)}`);
 }
 
 async function useHookVariant(formData: FormData) {
@@ -163,9 +178,14 @@ async function useHookVariant(formData: FormData) {
 
 async function generate() {
   "use server";
-  if (!dbConfigured()) return;
-  await draftWeek();
+  if (!dbConfigured()) {
+    redirect(`/${STUDIO_PATH}/content?msg=${encodeURIComponent("Database not configured, so nothing can be drafted.")}`);
+  }
+  const res = await draftWeek();
   revalidatePath(`/${STUDIO_PATH}/content`);
+  redirect(
+    `/${STUDIO_PATH}/content?drafted=${res.drafted}&skipped=${res.skipped}`,
+  );
 }
 
 const btn =
@@ -173,8 +193,10 @@ const btn =
 
 export default async function ContentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ gate: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   // Slug guard BEFORE any await/stream: wrong-slug paths must return a real
   // 404 status, not a streamed 200 shell with not-found content.
@@ -184,12 +206,18 @@ export default async function ContentPage({
   await connection();
   return (
     <GateStream title="Content">
-      <Content p={params} />
+      <Content p={params} sp={searchParams} />
     </GateStream>
   );
 }
 
-async function Content({ p }: { p: Promise<{ gate: string }> }) {
+async function Content({
+  p,
+  sp,
+}: {
+  p: Promise<{ gate: string }>;
+  sp: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { gate } = await p;
   if (!studioConfigured() || gate !== STUDIO_PATH) notFound();
   // Runtime data: session + DB reads, never prerendered.
@@ -203,6 +231,34 @@ async function Content({ p }: { p: Promise<{ gate: string }> }) {
     );
   }
   const base = `/${STUDIO_PATH}`;
+
+  // Action feedback (set by the Draft/Push actions via redirect params).
+  const q = await sp;
+  const one = (k: string): string => {
+    const v = q[k];
+    return typeof v === "string" ? v : "";
+  };
+  const drafted = one("drafted");
+  const skipped = one("skipped");
+  const pushed = one("pushed");
+  let msg = one("msg");
+  try {
+    msg = msg ? decodeURIComponent(msg) : "";
+  } catch {
+    // keep raw
+  }
+  let bannerText = msg;
+  let bannerOk = pushed !== "" && Number(pushed) > 0;
+  if (drafted !== "") {
+    bannerText = `Scribe drafted ${drafted} post${drafted === "1" ? "" : "s"}${
+      Number(skipped) > 0 ? ` (${skipped} slots already filled)` : ""
+    }. Approve below, then push to Buffer.`;
+    bannerOk = Number(drafted) > 0;
+  }
+  if (pushed !== "" && msg) {
+    bannerOk = Number(pushed) > 0;
+    bannerText = msg;
+  }
 
   if (!dbConfigured()) {
     return (
@@ -237,26 +293,33 @@ async function Content({ p }: { p: Promise<{ gate: string }> }) {
     <Shell>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-semibold tracking-tight">Content</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <a href={`${base}/settings`} className={btn}>
             Connections
           </a>
           <form action={pushToBuffer}>
-            <button type="submit" className="rounded-lg border px-3 py-1.5 text-sm font-semibold">
-              Push week to Buffer
-            </button>
+            <SubmitButton pending="Pushing...">Push week to Buffer</SubmitButton>
           </form>
           <form action={generate}>
-            <button
-              type="submit"
-              className="rounded-lg px-3 py-1.5 text-sm font-semibold"
-              style={{ background: "var(--accent)", color: "var(--accent-fg)" }}
-            >
+            <SubmitButton pending="Drafting..." primary>
               Draft this week
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>
+
+      {bannerText ? (
+        <p
+          className="mt-4 rounded-xl border px-4 py-3 text-sm"
+          style={{
+            borderColor: bannerOk ? "#1a7a4d55" : "#a33355",
+            color: bannerOk ? "#1a7a4d" : "#a33",
+            background: bannerOk ? "#1a7a4d0d" : "#a33308",
+          }}
+        >
+          {bannerText}
+        </p>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs">
         {PLATFORMS.map((p) => (
