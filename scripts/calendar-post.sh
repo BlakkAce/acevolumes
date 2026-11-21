@@ -34,7 +34,7 @@ PY
   case "$PLATFORM" in
     instagram) META=', "metadata": {"instagram": {"type": "post", "shouldShareToFeed": true}}' ;;
     facebook)  META=', "metadata": {"facebook": {"type": "post"}}' ;;
-    pinterest) if [ -n "${PINTEREST_BOARD:-}" ]; then META=', "metadata": {"pinterest": {"boardServiceId": "'"$PINTEREST_BOARD"'"}}'; else echo "id $ID (pinterest): SKIPPED - no board yet (create one in Pinterest, then export PINTEREST_BOARD=<boardId>)"; FAILED=$((FAILED+1)); continue; fi ;;
+    pinterest) if [ -n "${PINTEREST_BOARD:-}" ]; then PTITLE=$(echo "$ROW" | python3 -c "import json,sys; c=json.load(sys.stdin)['content']; t=c.split(chr(10))[0].strip()[:100]; print(json.dumps(t))"); META=', "metadata": {"pinterest": {"boardServiceId": "'"$PINTEREST_BOARD"'", "title": '"$PTITLE"', "url": "https://acevolumes.vercel.app"}}'; else echo "id $ID (pinterest): SKIPPED - no board yet (create one in Pinterest, then export PINTEREST_BOARD=<boardId>)"; FAILED=$((FAILED+1)); continue; fi ;;
     *) META="" ;;
   esac
   RES=$(curl -s -X POST "https://api.buffer.com" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d @- <<GQL
