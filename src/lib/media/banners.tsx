@@ -1,26 +1,23 @@
 import { ImageResponse } from "next/og";
 
 /**
- * Branded social banners with real typography (satori via next/og).
- * Every post gets its own banner: the post's hook as the headline, brand
- * plum/cream/gold identity, three rotating layouts. Static font weights are
- * pre-instanced from the brand's variable fonts (public/fonts).
+ * Branded social banners — light editorial design (David's approved look):
+ * cream field, black logo top-left, gold kicker, big ink headline, muted
+ * brand sub-line over a short gold rule, gold vertical bar on the right edge.
+ * Satori via next/og; fonts fetched from the site's own /fonts directory and
+ * the logo from /media — both embedded as data URIs (serverless-safe).
  */
 
 const SITE =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://acevolumes.vercel.app";
 
-const PLUM = "#3b153a";
-const PLUM_DEEP = "#2a0f29";
-const CREAM = "#fbf4e7";
-const GOLD = "#cf9d3f";
+const CREAM_BG = "#f7f1e6";
+const INK = "#17120b";
+const GOLD = "#8f6208";
+const MUTED = "#6f6252";
 
 const fontCache = new Map<string, ArrayBuffer>();
-/**
- * Fonts are fetched from the site's own /fonts directory: works on any host
- * (serverless bundles do not reliably include files read via readFileSync).
- */
 async function font(name: string): Promise<ArrayBuffer> {
   let buf = fontCache.get(name);
   if (!buf) {
@@ -33,14 +30,9 @@ async function font(name: string): Promise<ArrayBuffer> {
 }
 
 let logoCache: string | null = null;
-/**
- * Brand logo (cream strokes, transparent) as a data URI — fetched from the
- * site's own /media directory like the fonts: serverless-safe, and satori
- * embeds it directly into the render.
- */
 async function logoDataUrl(): Promise<string> {
   if (!logoCache) {
-    const res = await fetch(`${SITE}/media/logo-cream.png`);
+    const res = await fetch(`${SITE}/media/logo-black.png`);
     if (!res.ok) throw new Error(`logo fetch failed (${res.status})`);
     const buf = Buffer.from(await res.arrayBuffer());
     logoCache = `data:image/png;base64,${buf.toString("base64")}`;
@@ -50,15 +42,15 @@ async function logoDataUrl(): Promise<string> {
 
 export type BannerShape = "sq" | "land";
 
-const DIM: Record<BannerShape, { w: number; h: number; head: number; line: number; kick: number; foot: number; logo: number; maxChars: number }> = {
-  sq: { w: 1080, h: 1080, head: 80, line: 22, kick: 26, foot: 24, logo: 66, maxChars: 66 },
-  land: { w: 1200, h: 675, head: 60, line: 34, kick: 22, foot: 22, logo: 52, maxChars: 92 },
+const DIM: Record<
+  BannerShape,
+  { w: number; h: number; head: number; line: number; kick: number; sub: number; logoW: number; logoH: number; pad: number; bar: number; maxChars: number }
+> = {
+  sq: { w: 1080, h: 1080, head: 84, line: 20, kick: 25, sub: 28, logoW: 162, logoH: 108, pad: 92, bar: 54, maxChars: 58 },
+  land: { w: 1200, h: 675, head: 58, line: 30, kick: 21, sub: 22, logoW: 132, logoH: 88, pad: 84, bar: 44, maxChars: 88 },
 };
 
-/**
- * Cut long text at a natural phrase boundary: prefer the last punctuation
- * mark (a natural clause end), fall back to a word boundary with ellipsis.
- */
+/** Cut long text at a natural phrase boundary (clause end or word + ellipsis). */
 function smartCut(text: string, cap: number): string {
   if (text.length <= cap) return text;
   for (let i = cap; i >= Math.floor(cap * 0.5); i -= 1) {
@@ -72,7 +64,7 @@ function smartCut(text: string, cap: number): string {
   return `${cut.slice(0, at > cap * 0.55 ? at : cap).replace(/[\s.,;:]+$/, "")}…`;
 }
 
-/** Extract a banner headline from post content: the hook line, cleaned. */
+/** Extract a banner headline from post content: complete sentences that fit. */
 export function headlineFromContent(content: string, shape: BannerShape): string {
   const cap = DIM[shape].maxChars;
   let line =
@@ -84,17 +76,13 @@ export function headlineFromContent(content: string, shape: BannerShape): string
   line = line.replace(/\s*Save this\.\s*.*$/, "");
   line = line.replace(/#[A-Za-z0-9_]+/g, "").replace(/\s{2,}/g, " ").trim();
   line = line.replace(/[.,;:\s]+$/, "");
-  // Prefer complete sentence(s) that fit the canvas: a headline that ends
-  // mid-thought (or wraps ragged) reads badly. Accumulate sentences up to the
-  // cap; if the very first one is too long, use the first later sentence that
-  // fits before resorting to a clause cut.
   const sentences = line.split(/(?<=[.!?])\s+/).filter(Boolean);
   let acc = "";
   for (const sn of sentences) {
     const cand = acc ? `${acc} ${sn}` : sn;
     if (cand.length <= cap) acc = cand;
     else break;
-    if (acc.length >= 36) break;
+    if (acc.length >= Math.round(cap * 0.62)) break;
   }
   if (acc.length >= 24) return acc;
   const fits = sentences.find((sn) => sn.length >= 24 && sn.length <= cap);
@@ -125,153 +113,19 @@ function splitLines(text: string, shape: BannerShape): string[] {
     lines.length = 0;
     lines.push(...kept);
   }
-  // Rebalance: no one-word widow lines, no overlong last lines.
+  // Rebalance: no one-word widow lines.
   for (let i = 0; i < 3; i += 1) {
     const last = lines[lines.length - 1] ?? "";
     const prev = lines[lines.length - 2];
     if (!prev) break;
     const prevWords = prev.split(" ");
-    if (last.length < Math.max(8, Math.round(per * 0.3)) && prevWords.length > 2) {
+    if (last.length < Math.max(7, Math.round(per * 0.3)) && prevWords.length > 2) {
       const moved = prevWords.pop();
       lines[lines.length - 2] = prevWords.join(" ");
       lines[lines.length - 1] = `${moved} ${last}`.trim();
     } else break;
   }
   return lines;
-}
-
-function dots(seed: number, count: number): React.ReactNode[] {
-  const out: React.ReactNode[] = [];
-  for (let i = 0; i < count; i += 1) {
-    const a = Math.sin(seed + i * 12.9898) * 43758.5453;
-    const b = Math.sin(seed + i * 78.233) * 12543.1234;
-    const x = (a - Math.floor(a)) * 100;
-    const y = (b - Math.floor(b)) * 100;
-    const r = 2 + ((seed + i) % 4);
-    out.push(
-      <div
-        key={i}
-        style={{
-          position: "absolute",
-          left: `${x}%`,
-          top: `${y}%`,
-          width: r * 2,
-          height: r * 2,
-          borderRadius: 999,
-          background: CREAM,
-          opacity: 0.14,
-        }}
-      />,
-    );
-  }
-  return out;
-}
-
-function bars(seed: number, height: number, count = 9): React.ReactNode[] {
-  const out: React.ReactNode[] = [];
-  for (let i = 0; i < count; i += 1) {
-    const a = Math.sin(seed * 3 + i * 7.31) * 1913.7;
-    const hh = 0.25 + (a - Math.floor(a)) * 0.75;
-    out.push(
-      <div
-        key={i}
-        style={{
-          width: 13,
-          height: Math.round(height * hh),
-          background: GOLD,
-          display: "flex",
-        }}
-      />,
-    );
-  }
-  return out;
-}
-
-function BrandFooter({ shape, logo }: { shape: BannerShape; logo: string }): React.ReactNode {
-  const d = DIM[shape];
-  return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      <img
-        src={logo}
-        width={Math.round(d.logo * 1.5)}
-        height={d.logo}
-        style={{ display: "flex" }}
-      />
-      <span
-        style={{
-          color: CREAM,
-          opacity: 0.72,
-          fontSize: d.foot - 3,
-          letterSpacing: 1,
-        }}
-      >
-        acevolumes.vercel.app
-      </span>
-    </div>
-  );
-}
-
-function Kicker({ shape }: { shape: BannerShape }): React.ReactNode {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-      <div style={{ width: 56, height: 4, background: GOLD, display: "flex" }} />
-      <span
-        style={{
-          color: GOLD,
-          fontSize: DIM[shape].kick,
-          fontWeight: 600,
-          letterSpacing: 7,
-        }}
-      >
-        ACEVOLUMES
-      </span>
-    </div>
-  );
-}
-
-function Headline({
-  lines,
-  shape,
-  align,
-}: {
-  lines: string[];
-  shape: BannerShape;
-  align: "flex-start" | "center";
-}): React.ReactNode {
-  const d = DIM[shape];
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        alignItems: align,
-        textAlign: align === "center" ? "center" : "left",
-      }}
-    >
-      {lines.map((l, i) => (
-        <span
-          key={i}
-          style={{
-            color: CREAM,
-            fontSize: d.head,
-            fontWeight: 700,
-            lineHeight: 1.14,
-            display: "flex",
-          }}
-        >
-          {l}
-        </span>
-      ))}
-    </div>
-  );
 }
 
 export async function renderBannerPng(opts: {
@@ -281,10 +135,75 @@ export async function renderBannerPng(opts: {
 }): Promise<Buffer> {
   const { headline, shape, variant } = opts;
   const d = DIM[shape];
-  const logo = await logoDataUrl();
   const lines = splitLines(headline, shape);
-  const centered = variant % 3 === 1;
-  const barsHeavy = variant % 3 === 2;
+  const logo = await logoDataUrl();
+  const centered = variant % 2 === 1;
+
+  const textBlock = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: shape === "sq" ? 34 : 24,
+        alignItems: centered ? "center" : "flex-start",
+        textAlign: centered ? "center" : "left",
+      }}
+    >
+      <span
+        style={{
+          color: GOLD,
+          fontSize: d.kick,
+          fontWeight: 600,
+          letterSpacing: 6,
+          display: "flex",
+        }}
+      >
+        ACEVOLUMES
+      </span>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: shape === "sq" ? 10 : 8,
+          alignItems: centered ? "center" : "flex-start",
+        }}
+      >
+        {lines.map((l, i) => (
+          <span
+            key={i}
+            style={{
+              color: INK,
+              fontSize: d.head,
+              fontWeight: 700,
+              lineHeight: 1.12,
+              letterSpacing: -1,
+              display: "flex",
+            }}
+          >
+            {l}
+          </span>
+        ))}
+      </div>
+      <span
+        style={{
+          color: MUTED,
+          fontSize: d.sub,
+          fontWeight: 500,
+          display: "flex",
+        }}
+      >
+        Digital systems that make results easier.
+      </span>
+      <div
+        style={{
+          width: shape === "sq" ? 116 : 96,
+          height: 7,
+          background: GOLD,
+          display: "flex",
+        }}
+      />
+    </div>
+  );
 
   const body =
     centered && shape === "sq" ? (
@@ -294,27 +213,15 @@ export async function renderBannerPng(opts: {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
           justifyContent: "center",
-          gap: 44,
+          alignItems: "center",
+          paddingLeft: d.pad,
+          paddingRight: d.bar + 40,
+          gap: 64,
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            width: 640,
-            height: 640,
-            borderRadius: 999,
-            border: `3px solid ${GOLD}`,
-            opacity: 0.5,
-            display: "flex",
-            top: 220,
-            left: 220,
-          }}
-        />
-        <img src={logo} width={252} height={168} style={{ display: "flex" }} />
-        <Headline lines={lines} shape={shape} align="center" />
-        <BrandFooter shape={shape} logo={logo} />
+        <img src={logo} width={d.logoW} height={d.logoH} style={{ display: "flex" }} />
+        {textBlock}
       </div>
     ) : (
       <div
@@ -324,53 +231,14 @@ export async function renderBannerPng(opts: {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: barsHeavy ? "0" : 64,
-          paddingBottom: 56,
+          paddingLeft: d.pad,
+          paddingRight: d.bar + 48,
+          paddingTop: shape === "sq" ? 88 : 64,
+          paddingBottom: shape === "sq" ? 84 : 60,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 36,
-            paddingLeft: barsHeavy ? 72 : 0,
-            paddingRight: barsHeavy ? 72 : 0,
-            paddingTop: barsHeavy ? 96 : 0,
-          }}
-        >
-          <Kicker shape={shape} />
-          {barsHeavy ? (
-            <div
-              style={{
-                display: "flex",
-                borderLeft: `6px solid ${GOLD}`,
-                paddingLeft: 36,
-              }}
-            >
-              <Headline lines={lines} shape={shape} align="flex-start" />
-            </div>
-          ) : (
-            <Headline lines={lines} shape={shape} align="flex-start" />
-          )}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-          {barsHeavy ? (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-end",
-                gap: 10,
-                paddingLeft: 72,
-                height: 90,
-              }}
-            >
-              {bars(variant + 5, 90, 13)}
-            </div>
-          ) : (
-            <div style={{ display: "flex", height: 20 }} />
-          )}
-          <BrandFooter shape={shape} logo={logo} />
-        </div>
+        <img src={logo} width={d.logoW} height={d.logoH} style={{ display: "flex" }} />
+        {textBlock}
       </div>
     );
 
@@ -382,11 +250,21 @@ export async function renderBannerPng(opts: {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          background: `radial-gradient(ellipse 900px 700px at 18% 12%, ${PLUM} 0%, ${PLUM_DEEP} 78%)`,
+          background: CREAM_BG,
           position: "relative",
         }}
       >
-        {dots(variant + 3, 16)}
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: d.bar,
+            background: GOLD,
+            display: "flex",
+          }}
+        />
         {body}
       </div>
     ),
