@@ -19,6 +19,7 @@ export function generateMetadata({ params }: { params: Promise<{ slug: string }>
   return {
     title: "Case study",
     description: "A delivered AceVolumes project: the challenge, the work and the outcome.",
+    alternates: { canonical: "/work" },
   };
 }
 

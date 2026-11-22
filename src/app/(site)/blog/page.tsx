@@ -3,7 +3,7 @@ import Link from "next/link";
 import { POSTS } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "Blog — AceVolumes",
+  title: { absolute: "Blog — AceVolumes" },
   description:
     "Answer-first guides on websites that win clients: lender site checklists, conversion fixes, honest pricing. From the AceVolumes studio in Lagos.",
   alternates: { canonical: "/blog" },

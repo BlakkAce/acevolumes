@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { JsonLd } from "@/components/json-ld";
 import { organizationLd, websiteLd } from "@/lib/seo";
 import { CapabilityMarquee } from "@/components/capability-marquee";
@@ -9,6 +10,10 @@ import { KineticHeading } from "@/components/kinetic-heading";
 import { Reveal } from "@/components/reveal";
 import { WorkStack } from "@/components/work-stack";
 import { CATALOG, CLIENT_PROOF, MARQUEE_ITEMS, PROOF, STEPS, VALUES } from "@/lib/content";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (
