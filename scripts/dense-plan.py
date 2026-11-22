@@ -17,14 +17,14 @@ CAL_JSON = "docs/social-calendar.json"
 CAL_MD = "docs/social-calendar.md"
 
 DAYPARTS = {
-    "x":         [12, 14, 16, 18, 20, 22, 0, 2, 4],
-    "threads":   [13, 15, 17, 19, 21, 23, 2],
+    "x":         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22],
+    "threads":   [5, 7, 9, 11, 13, 15, 17, 19, 21, 23],
     "instagram": [14, 17, 20, 23, 2, 5],
     "pinterest": [14, 16, 18, 20, 22, 0, 2, 4],
     "facebook":  [16, 19, 22, 1],
     "linkedin":  [13, 15, 17, 19, 21],
 }
-WEEKDAY_SPLIT = {"x": 9, "threads": 7, "pinterest": 8, "instagram": 6, "facebook": 4, "linkedin": 5}
+WEEKDAY_SPLIT = {"x": 12, "threads": 10, "pinterest": 8, "instagram": 6, "facebook": 4, "linkedin": 5}
 WEEKEND_SPLIT = dict(WEEKDAY_SPLIT, linkedin=3)
 CHANNEL_CAP = 10  # Buffer free plan: max 10 unsent posts queued per channel
 
@@ -100,6 +100,39 @@ def psql(sql):
         print("PSQL ERROR:", r.stderr[:300]); sys.exit(1)
     return r.stdout.strip()
 
+# Reach engine: rotating tag sets per platform, tuned to 2026 platform rules.
+# X: 1-2 inline tags (3+ = -17% reach, never lead with #). Threads: exactly 1 tag (platform limit).
+# IG: 10 tags, small-account strategy (mix niche + mid-size). FB: 2. LI: 3. Pinterest: keywords already in caption.
+TAGS = {
+    "x": ["#webdesign #smallbusiness", "#ecommerce #webdesign", "#branding #digitalmarketing",
+          "#SEO #webdesign", "#buildinpublic #smallbusiness", "#digitalmarketing #ecommerce",
+          "#entrepreneurship #branding", "#smallbusiness #webdevelopment"],
+    "threads": ["#WebDesign", "#Ecommerce", "#SmallBusiness", "#Branding", "#DigitalMarketing",
+                "#Entrepreneurship", "#WebDevelopment", "#SmallBusinessTips"],
+    "instagram": ["#webdesign", "#websitedesign", "#webdeveloper", "#webdevelopment", "#ecommercewebsite",
+                  "#ecommerce", "#brandidentity", "#branding", "#smallbusinessmarketing", "#smallbusinessowner",
+                  "#digitalmarketing", "#uxdesign", "#webdesigner", "#nigerianbusiness", "#lagosbusiness", "#website"],
+    "facebook": ["#webdesign #smallbusiness", "#smallbusiness #webdevelopment", "#branding #digitalmarketing"],
+    "linkedin": ["#WebDesign #DigitalMarketing #SmallBusiness", "#WebDevelopment #Branding #Entrepreneurship",
+                 "#DigitalMarketing #WebDesign #SEO"],
+}
+
+def tag(platform, content, seed=None):
+    import random
+    random.seed(str(seed if seed is not None else content[:24]))
+    body = content.rstrip()
+    if "#" in body or platform not in TAGS:
+        return body
+    if platform == "x":
+        t = TAGS["x"][random.randrange(len(TAGS["x"]))]
+        if len(body) + len(t) + 2 <= 278:
+            body = body + "\n\n" + t
+        return body
+    if platform == "instagram":
+        bank = TAGS["instagram"]; off = random.randrange(6)
+        return body + "\n\n" + " ".join(bank[(off + i) % len(bank)] for i in range(10))
+    return body + "\n\n" + TAGS[platform][random.randrange(len(TAGS[platform]))]
+
 def synth(platform):
     import random
     random.seed(platform + str(datetime.now().date()))
@@ -137,7 +170,7 @@ for day_offset, tag in ((0, "today"), (1, "tomorrow"), (2, "day-after")):
             hours = hours[:count]
         for h in hours:
             if not pools[platform]:
-                content = synth(platform)
+                content = tag(platform, synth(platform))
             else:
                 content = pools[platform].pop(0)["content"]
             plan.append({"when": datetime(d.year, d.month, d.day, h, tzinfo=timezone.utc), "platform": platform, "content": content, "tag": tag})
