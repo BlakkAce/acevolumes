@@ -177,7 +177,7 @@ for item in plan:
 
 # 4. calendar
 CHANNELS = {"facebook": ("66148c5df1ac4a3c9404c724", "1"), "instagram": ("66148c22f1ac4a3c94037c95", "1"),
-            "linkedin": ("6af53c2f62b70b94b001b4d8", "1"), "pinterest": ("6af5352062b70b94b0016472", "2"),
+            "linkedin": ("6af53c2f62b70b94b001b4d8", "1"), "pinterest": ("6b0265bb8541f09ecb5da362", "2"),
             "threads": ("6af533a062b70b94b001597c", "2"), "x": ("6af5341562b70b94b0015cf2", "2")}
 cal = []
 for line in psql("SELECT id || '|' || platform || '|' || status || '|' || to_char(scheduled_for, 'YYYY-MM-DD\"T\"HH24:MI:SSZ') || '|' || replace(replace(content, chr(10), E'\\\\n'), chr(13), '') FROM posts WHERE scheduled_for >= now() - interval '1 day' AND status IN ('draft','approved','buffered') ORDER BY scheduled_for").split("\n"):
