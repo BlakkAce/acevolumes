@@ -6,6 +6,8 @@ export const FOUNDER = {
   photo: "/img/founder.jpg",
   photoAlt: "Portrait of David Olawuni, founder of AceVolumes",
   location: "Lagos, Nigeria",
+  whatsapp: "2347037185273",
+  whatsappDisplay: "+234 703 718 5273",
   links: [
     { label: "LinkedIn", href: "https://ng.linkedin.com/in/david-olawuni" },
     { label: "Instagram · @acevolumes", href: "https://www.instagram.com/acevolumes/" },

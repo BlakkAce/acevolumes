@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/page-header";
 import { Reveal } from "@/components/reveal";
 import { Amplitude, MARK } from "@/components/amplitude";
 import { JsonLd } from "@/components/json-ld";
+import { FOUNDER } from "@/lib/founder";
 import { faqLd, organizationLd, breadcrumbLd, SITE } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -91,6 +92,14 @@ export default function ContactPage() {
               className="mt-3 block font-display text-[clamp(1.1rem,2vw,1.4rem)] text-[var(--accent)] underline decoration-[var(--accent)]/40 underline-offset-[6px] transition-colors hover:decoration-[var(--accent)]"
             >
               acevolumesofficial@gmail.com
+            </a>
+            <a
+              href={`https://wa.me/${FOUNDER.whatsapp}?text=${encodeURIComponent("Hi David, I'd like to discuss a project.")}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-4 inline-flex items-center gap-2 rounded-full border hairline px-5 py-2.5 font-display text-[14px] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            >
+              WhatsApp: {FOUNDER.whatsappDisplay}
             </a>
           </Reveal>
 

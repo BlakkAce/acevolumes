@@ -106,6 +106,13 @@ export function Hero() {
                 Reply to my email
                 <ArrowUpRight size={17} weight="bold" />
               </a>
+              <MagneticLink
+                href={`https://wa.me/${FOUNDER.whatsapp}?text=${encodeURIComponent("Hi David, I'd like to discuss a project.")}`}
+                variant="outline"
+                external
+              >
+                WhatsApp me
+              </MagneticLink>
               <MagneticLink href="/work" variant="outline">
                 See the work
               </MagneticLink>
@@ -139,6 +146,14 @@ export function Hero() {
               <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--gold)]">
                 We pride in delivering the very best.
               </p>
+              <a
+                href={`https://wa.me/${FOUNDER.whatsapp}?text=${encodeURIComponent("Hi David, I'd like to discuss a project.")}`}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-5 inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.12em] text-[var(--accent)] underline decoration-[var(--accent)]/40 underline-offset-[6px] transition-colors hover:decoration-[var(--accent)]"
+              >
+                WhatsApp: {FOUNDER.whatsappDisplay}
+              </a>
             </div>
           </div>
         </motion.div>
