@@ -61,7 +61,7 @@ export function Hero() {
               className="anim-enter font-mono text-[12px] uppercase tracking-[0.12em] muted"
               style={{ animationDelay: "80ms" }}
             >
-              The studio you email back directly — since 2016
+              The studio you email back directly. Since 2016.
             </p>
 
             <KineticHeading
@@ -84,15 +84,15 @@ export function Hero() {
               style={{ animationDelay: "560ms" }}
             >
               Conversion-first websites for mortgage teams and small
-              businesses — 100+ shipped since 2016. You see a real preview of
-              your site in 10 days or less, then we iterate until it closes.
+              businesses. 100+ built since 2016. You see a real preview of
+              your site in 10 days or less.
             </p>
 
             <p
               className="anim-enter mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--gold)]"
               style={{ animationDelay: "640ms" }}
             >
-              First preview ≤ 10 days · Fixed price up front · Direct line to the founder
+              First preview in 10 days · Fixed price up front · Direct line to the founder
             </p>
 
             <div
@@ -112,9 +112,6 @@ export function Hero() {
                 external
               >
                 WhatsApp me
-              </MagneticLink>
-              <MagneticLink href="/work" variant="outline">
-                See the work
               </MagneticLink>
             </div>
           </div>
@@ -140,8 +137,8 @@ export function Hero() {
                 </div>
               </div>
               <p className="mt-5 text-[15px] leading-relaxed">
-                I run this studio and I wrote you myself. Expect a reply from
-                me — not a bot — within 24 hours.
+                I run this studio myself. You get a reply from me within 24
+                hours. No bots, no middlemen.
               </p>
               <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--gold)]">
                 We pride in delivering the very best.

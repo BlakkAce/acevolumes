@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/json-ld";
 import { organizationLd, websiteLd } from "@/lib/seo";
+import { FOUNDER } from "@/lib/founder";
 import { CapabilityMarquee } from "@/components/capability-marquee";
 import { CountUp } from "@/components/count-up";
 import { Hero } from "@/components/hero";
@@ -218,12 +219,22 @@ export default function Home() {
               get a real plan back: one fixed price, one delivery date. No
               obligation until you say go.
             </p>
-            <Link
-              href="/contact"
-              className="glow mt-7 inline-flex items-center gap-3 rounded-full bg-[var(--accent)] px-7 py-4 font-display text-[15px] text-[var(--accent-fg)] transition-colors duration-300 hover:opacity-90"
-            >
-              Start a project
-            </Link>
+            <div className="mt-7 flex flex-wrap items-center gap-4">
+              <Link
+                href="/contact"
+                className="glow inline-flex items-center gap-3 rounded-full bg-[var(--accent)] px-7 py-4 font-display text-[15px] text-[var(--accent-fg)] transition-colors duration-300 hover:opacity-90"
+              >
+                Start a project
+              </Link>
+              <a
+                href={`https://wa.me/${FOUNDER.whatsapp}?text=${encodeURIComponent("Hi David, I'd like to discuss a project.")}`}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center gap-3 rounded-full border hairline px-7 py-4 font-display text-[15px] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              >
+                WhatsApp me
+              </a>
+            </div>
           </Reveal>
         </div>
       </section>
