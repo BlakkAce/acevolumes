@@ -97,12 +97,12 @@ export function NichePan() {
           <p className="font-mono text-[12px] uppercase tracking-[0.12em] text-[var(--gold)]">
             Who we work with
           </p>
-          <h2 className="mt-5 max-w-[14ch] font-display text-[clamp(2.2rem,5vw,3.75rem)]">
-            Two niches we know cold.
+          <h2 className="mt-5 max-w-[16ch] font-display text-[clamp(2.2rem,5vw,3.75rem)]">
+            We already know your industry.
           </h2>
           <p className="mt-6 max-w-[40ch] text-[16px] leading-relaxed muted">
-            We serve plenty of industries, but these are the rooms where we
-            already know the players.
+            If you work in one of these rooms, you start with a team that has
+            seen it before.
           </p>
         </div>
 

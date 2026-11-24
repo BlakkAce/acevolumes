@@ -40,7 +40,7 @@ export function SiteFooter() {
         <div className="grid gap-12 py-16 md:grid-cols-12 md:gap-8">
           <div className="md:col-span-5">
             <p className="font-display text-[clamp(2rem,4.5vw,3.25rem)] tracking-[-0.04em]">
-              Let us make some noise.
+              Say hello.
             </p>
             <a
               href="mailto:acevolumesofficial@gmail.com"

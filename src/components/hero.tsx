@@ -2,8 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AnimatePresence,
   motion,
   useReducedMotion,
   useScroll,
@@ -12,7 +13,6 @@ import {
 } from "motion/react";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Constellation } from "@/components/constellation";
-import { KineticHeading } from "@/components/kinetic-heading";
 import { MagneticLink } from "@/components/magnetic-link";
 import { Swoosh } from "@/components/swoosh";
 import { useMediaQuery } from "@/components/use-media-query";
@@ -24,6 +24,33 @@ const Hero3D = dynamic(() => import("@/components/hero-3d").then((m) => m.Hero3D
   ssr: false,
   loading: () => null,
 });
+
+/** What we build, cycling in the headline. Covers the whole offer, not just sites. */
+const ROTATE = ["Websites", "Online stores", "Brand identities", "Marketing systems", "Custom software"];
+
+function RotatingService() {
+  const reduce = useReducedMotion();
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const t = setInterval(() => setI((v) => (v + 1) % ROTATE.length), 2400);
+    return () => clearInterval(t);
+  }, [reduce]);
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.span
+        key={ROTATE[i]}
+        initial={reduce ? false : { y: "70%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={reduce ? undefined : { y: "-70%", opacity: 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="inline-block text-[var(--gold)]"
+      >
+        {ROTATE[i]}
+      </motion.span>
+    </AnimatePresence>
+  );
+}
 
 /**
  * Cinematic entrance: eyebrow, word-masked headline, drawn swoosh, sub, CTAs,
@@ -64,11 +91,9 @@ export function Hero() {
               The studio you email back directly. Since 2016.
             </p>
 
-            <KineticHeading
-              as="h1"
-              text="Websites built to win clients, not compliments."
-              className="mt-6 font-display text-[clamp(2.4rem,5.4vw,4.4rem)]"
-            />
+            <h1 className="mt-6 font-display text-[clamp(2.4rem,5.4vw,4.4rem)]">
+              <RotatingService /> built to win clients, not compliments.
+            </h1>
 
             <Swoosh className="mt-2 h-10 w-[min(420px,80%)]" />
 
@@ -83,9 +108,9 @@ export function Hero() {
               className="anim-enter mt-5 max-w-[52ch] text-[17px] leading-relaxed muted md:text-[18px]"
               style={{ animationDelay: "560ms" }}
             >
-              Conversion-first websites for mortgage teams and small
-              businesses. 100+ built since 2016. You see a real preview of
-              your site in 10 days or less.
+              Conversion-first websites, stores, brands, marketing and
+              software for mortgage teams and small businesses. 100+ builds
+              since 2016. First preview in 10 days or less.
             </p>
 
             <p

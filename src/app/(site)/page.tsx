@@ -3,14 +3,13 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/components/json-ld";
 import { organizationLd, websiteLd } from "@/lib/seo";
 import { FOUNDER } from "@/lib/founder";
-import { CapabilityMarquee } from "@/components/capability-marquee";
 import { CountUp } from "@/components/count-up";
 import { Hero } from "@/components/hero";
 import { NichePan } from "@/components/niche-pan";
 import { KineticHeading } from "@/components/kinetic-heading";
 import { Reveal } from "@/components/reveal";
 import { WorkStack } from "@/components/work-stack";
-import { CATALOG, CLIENT_PROOF, MARQUEE_ITEMS, PROOF, STEPS, VALUES } from "@/lib/content";
+import { CATALOG, CLIENT_PROOF, PROOF, STEPS, VALUES } from "@/lib/content";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -60,7 +59,7 @@ export default function Home() {
       <section id="services" className="mx-auto w-full max-w-[1400px] px-5 py-24 md:px-8 md:py-32">
         <KineticHeading
           as="h2"
-          text="Nine disciplines, one studio."
+          text="Everything you need. One team."
           className="max-w-[19ch] font-display text-[clamp(2.2rem,5vw,3.75rem)]"
         />
         <Reveal delay={0.08} className="mt-6 max-w-[52ch] text-[17px] leading-relaxed muted">
@@ -93,8 +92,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      <CapabilityMarquee items={MARQUEE_ITEMS} />
 
       {/* Selected work as a pinned stack. */}
       <section id="work" className="relative">
