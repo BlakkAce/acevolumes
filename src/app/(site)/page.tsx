@@ -63,8 +63,8 @@ export default function Home() {
           className="max-w-[19ch] font-display text-[clamp(2.2rem,5vw,3.75rem)]"
         />
         <Reveal delay={0.08} className="mt-6 max-w-[52ch] text-[17px] leading-relaxed muted">
-          Everything below is offered today. Open a category for the full
-          list, then ask for one number: a fixed price with a delivery date.
+          Open a category for the full list, then ask for one number: a fixed
+          price with a delivery date.
         </Reveal>
 
         <div className="mt-16 grid gap-x-14 border-t hairline md:grid-cols-2">
@@ -99,7 +99,7 @@ export default function Home() {
           <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <KineticHeading
               as="h2"
-              text="Work we are willing to put our name on."
+              text="Work we have shipped."
               className="max-w-[16ch] font-display text-[clamp(2.2rem,5vw,3.75rem)]"
             />
             <Link
@@ -155,7 +155,7 @@ export default function Home() {
           <div className="md:col-span-5">
             <Reveal>
               <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)]">
-                What clients keep coming back for.
+                Why clients choose us.
               </h2>
             </Reveal>
             <ul className="mt-10 space-y-8">
@@ -171,7 +171,7 @@ export default function Home() {
           <div className="md:col-span-6 md:col-start-7">
             <div className="space-y-12">
               <p className="font-mono text-[11.5px] uppercase tracking-[0.1em] muted">
-                Numbers our clients publish about themselves
+                Results our clients are already publishing
               </p>
               {CLIENT_PROOF.map((t, i) => (
                 <Reveal
@@ -206,7 +206,7 @@ export default function Home() {
           <Reveal>
             <KineticHeading
               as="h2"
-              text="Let's turn your volume up."
+              text="Ready when you are."
               className="max-w-[16ch] font-display text-[clamp(2.4rem,6vw,4.5rem)]"
             />
           </Reveal>
@@ -214,7 +214,7 @@ export default function Home() {
             <p className="text-[16px] leading-relaxed muted">
               Send a paragraph about your business. Within one working day you
               get a real plan back: one fixed price, one delivery date. No
-              obligation until you say go.
+              obligation until you say go. First preview in 10 days.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Link

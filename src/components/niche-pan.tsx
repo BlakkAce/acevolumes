@@ -24,7 +24,7 @@ const PANELS = [
   {
     tag: "Dedicated vertical",
     title: "Mortgage technology",
-    body: "Custom loan pipeline systems, borrower applications, CRM workflows, ARIVE integration pathways and MISMO export tooling. Built and audited by this studio.",
+    body: "For lenders who need more than a website: loan pipelines, borrower applications and CRM systems that talk to each other.",
     points: ["Custom mortgage software", "Loan pipeline & CRM", "ARIVE integrations", "System audits"],
     image: "/img/mortgage-tech.jpg",
     alt: "A loan pipeline dashboard rendered in plum and gold",
@@ -38,6 +38,15 @@ const PANELS = [
     image: "/img/work-ecommerce.jpg",
     alt: "Premium e-commerce packaging in plum and gold",
     href: null,
+  },
+  {
+    tag: "And everywhere else",
+    title: "Every other industry",
+    body: "Restaurants, coaches, law firms, personal brands. If your business needs to look credible online, that is the job.",
+    points: ["Websites that convert", "Brands people trust", "Marketing that reports back"],
+    image: "/img/work-brand.jpg",
+    alt: "Brand identity work in cream and gold",
+    href: "/services",
   },
 ];
 

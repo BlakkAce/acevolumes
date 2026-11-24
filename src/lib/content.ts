@@ -22,7 +22,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-instafi.jpg",
     live: "https://instafiloans.com",
     summary:
-      "A California mortgage banker-and-broker site built around one promise: we shop till we drop your rate. Purchase, refinance and cash-out paths one tap away, with calculators and instant pre-qualification.",
+      "A California mortgage site that turns rate-shoppers into pre-qualified applicants.",
     challenge:
       "InstaFi operates as both a mortgage banker and a mortgage broker with 70+ lending relationships, and online that advantage was invisible. The site had to explain why banker-and-broker matters to a borrower in plain language, in seconds.",
     approach: [
@@ -46,7 +46,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-excel-realty.jpg",
     live: "https://teamerm.com",
     summary:
-      "One roof over two businesses: a 220-person realty and mortgage company. Buying, selling and financing journeys plus a recruiting engine for agents and loan officers.",
+      "One site serving a 220-person realty and mortgage company, their buyers and their recruiting.",
     challenge:
       "A large independent firm that still wants to feel boutique. The site had to serve four audiences at once (buyers, sellers, borrowers and recruits) without reading as four different websites.",
     approach: [
@@ -69,7 +69,7 @@ export const PROJECTS: Project[] = [
     year: "2026",
     image: "/img/mortgage-tech.jpg",
     summary:
-      "A custom mortgage operating system: loan pipeline, CRM and borrower applications in one build, with ARIVE integration pathways and a workflow audit.",
+      "The custom loan pipeline and CRM behind a mortgage group's daily work.",
     challenge:
       "A mortgage business was running loans across spreadsheets, a generic CRM and three tools that did not talk to each other. Pipeline state lived in the operations manager's head.",
     approach: [
@@ -93,7 +93,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-hcmg-loans.jpg",
     live: "https://hcmgloans.com",
     summary:
-      "A lender site that leads with a 60-second affordability estimate, with no hard credit pull and no pressure, before a borrower ever talks to a loan officer.",
+      "A lender site with a 60-second affordability check. No credit pull, no pressure.",
     challenge:
       "Most borrowers spend weeks talking to lenders before understanding what they can actually afford. HCMG wanted the reverse: know your numbers first, then connect when you are ready.",
     approach: [
@@ -117,7 +117,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-tab-team.jpg",
     live: "https://thetabteam.org",
     summary:
-      "A Maryland and DC realty team positioned around equity strategy: home-worth tooling, buyer and seller journeys, and 1,200+ Google reviews doing the talking.",
+      "1,200+ Google reviews doing the selling for a Maryland and DC realty team.",
     challenge:
       "A team with 25 years in the business and hundreds of five-star reviews was presenting like everybody else. The site needed a position (equity strategists, not just another agent) and the proof to back it.",
     approach: [
@@ -141,7 +141,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-trueterra.jpg",
     live: "https://trueterraoils.com",
     summary:
-      "A doTERRA wellness storefront organised by goal (sleep, stress, immunity) with guided routines and a 24/7 AI guide instead of a wall of products.",
+      "A wellness store organized by goal, with a 24/7 AI guide instead of a wall of products.",
     challenge:
       "New-to-oils shoppers do not buy product names, they buy outcomes. The store had to turn a huge catalogue into simple, safe routines a first-time buyer could actually follow.",
     approach: [
@@ -165,7 +165,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-jsamsmith.jpg",
     live: "https://www.jsamsmith.com",
     summary:
-      "A personal-brand home for an Emmy-winning tap dancer: bio, events, speaking, a tap-shoe store and booking: one stage for the artist and the business.",
+      "An Emmy-winning dancer's brand, events and shoe store on one stage.",
     challenge:
       "An artist with a global profile needed one home for many audiences (fans, students, event bookers, shoppers) without the site reading as a brochure or as a store with extras.",
     approach: [
@@ -189,7 +189,7 @@ export const PROJECTS: Project[] = [
     image: "/img/work/client-top-trading.jpg",
     live: "https://toptradingdiscounts.com",
     summary:
-      "A community-ranked deals hub for prop-firm traders: compare offers, vote them up or down, and subscribe for the best discount codes first.",
+      "A community-ranked deals hub that prop-firm traders check before they buy.",
     challenge:
       "Prop-firm discount codes live scattered across affiliate pages. The play was one trusted place where community votes decide which firms rise to the top.",
     approach: [
@@ -214,7 +214,7 @@ export type Proof =
 
 export const PROOF: Proof[] = [
   { kind: "static", display: "2016", label: "Working since" },
-  { kind: "count", to: 100, suffix: "+", label: "Websites built" },
+  { kind: "count", to: 100, suffix: "+", label: "Projects shipped" },
   { kind: "count", to: 30, prefix: "+", suffix: "%", label: "Average lift in site engagement" },
   { kind: "count", to: 20, prefix: "+", suffix: "%", label: "Average lift in organic search traffic" },
 ];
@@ -234,7 +234,7 @@ export const MARQUEE_ITEMS = [
 export const STEPS = [
   {
     name: "Listen",
-    body: "Tell us what you sell, who buys it, and what has already been tried. We reply within one working day, with questions first. Most of our clients are in the US, and we work with teams anywhere in the world.",
+    body: "Tell us what you sell, who buys it, and what has been tried. We reply within one working day, with questions first.",
   },
   {
     name: "Shape",
@@ -250,22 +250,22 @@ export const STEPS = [
   },
   {
     name: "Measure",
-    body: "Ninety days of reporting on what moved. If a channel is not earning its spend, we say so and reallocate it.",
+    body: "Ninety days of reporting on what moved. If something is not working, we say so and fix it.",
   },
 ];
 
 export const VALUES = [
   {
     title: "Experienced team",
-    body: "The people who pitch your project are the people who build it. No handoff to a junior team after the contract is signed.",
+    body: "The person who hears your brief is the person who builds it. No junior handoffs.",
   },
   {
     title: "Tailored strategies",
-    body: "A mortgage desk in Texas and a skincare store in California do not need the same plan. We write one for you rather than reselling a template.",
+    body: "A lender in Texas and a skincare store in California get different plans. Yours is written from scratch.",
   },
   {
     title: "Results-driven",
-    body: "We report on enquiries, calls and sales, not impressions. If the number you care about did not move, the work is not finished.",
+    body: "We report on enquiries, calls and sales. Not impressions. If your number did not move, the work is not finished.",
   },
 ];
 

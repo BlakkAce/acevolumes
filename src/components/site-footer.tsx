@@ -97,7 +97,7 @@ export function SiteFooter() {
             <address className="mt-5 space-y-1 text-[15px] not-italic leading-relaxed muted">
               <p>Lagos, Nigeria</p>
               <p>Clients across borders</p>
-              <p>Mon to Fri, 9am to 6pm WAT</p>
+              <p>Replies within one working day. Any timezone.</p>
             </address>
             <div className="mt-4 flex flex-wrap gap-4 font-mono text-[12px] uppercase tracking-[0.08em]">
               <a href="https://www.linkedin.com/company/acevolumes" target="_blank" rel="noreferrer noopener" className="transition-colors hover:text-[var(--gold)]">LinkedIn</a>
